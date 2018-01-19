@@ -1,0 +1,19 @@
+body, html {
+    margin: 0;
+    padding: 0;
+}
+
+.notification-bar {
+    padding: 20px;
+    background: #eee;
+    color: #fff;
+    font-family: roboto, arial, 'sans-serif';
+}
+
+.notification-bar.error {
+    background: #d20e19;
+}
+
+.content {
+    padding: 20px;
+}

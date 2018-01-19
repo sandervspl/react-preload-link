@@ -1,0 +1,40 @@
+{
+    "name": "react-preload-link",
+    "main": [
+        "dist/react-preload-link.min.js",
+        "dist/react-preload-link.min.css"
+    ],
+    "version": "1.0.0",
+    "homepage": "https://github.com/sandervspl/react-preload-link",
+    "authors": [
+        "Sander Vispoel"
+    ],
+    "description": "A link that preloads your data before navigating built with and for ReactJS",
+    "moduleType": [
+        "amd",
+        "globals",
+        "node"
+    ],
+    "dependencies": {},
+    "keywords": [
+        "react",
+        "reactjs",
+        "react component",
+        "component",
+        "async",
+        "fetch",
+        "link",
+        "preload",
+        "ui"
+    ],
+    "license": "MIT",
+    "ignore": [
+        ".editorconfig",
+        ".gitignore",
+        "package.json",
+        "src",
+        "node_modules",
+        "example",
+        "test"
+    ]
+}
