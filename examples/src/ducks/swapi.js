@@ -1,15 +1,17 @@
-import Progress from 'react-progress-2';
+import { PRELOAD_FAIL } from 'react-preload-link';
+import * as app from './app';
 
 // action constants
-export const LOADING = 'app/LOADING';
-export const FAIL = 'app/FAIL';
-export const SUCCESS = 'app/SUCCESS';
+export const LOADING = 'swapi/LOADING';
+export const FAIL = 'swapi/FAIL';
+export const SUCCESS = 'swapi/SUCCESS';
 
 // state
 export const initialState = {
     loading: false,
     error: false,
     success: false,
+    people: [],
 };
 
 // reducer
@@ -17,19 +19,16 @@ export const initialState = {
 export default (state = initialState, action = {}) => {
     switch (action.type) {
         case LOADING: {
-            if (!state.loading) Progress.show();
-
             return {
                 ...state,
                 loading: true,
                 error: false,
                 success: false,
+                people: [],
             };
         }
 
         case FAIL: {
-            Progress.hideAll();
-
             return {
                 ...state,
                 loading: false,
@@ -39,13 +38,12 @@ export default (state = initialState, action = {}) => {
         }
 
         case SUCCESS: {
-            Progress.hideAll();
-
             return {
                 ...state,
                 loading: false,
                 error: false,
                 success: true,
+                people: [...state.people, action.payload],
             };
         }
 
@@ -58,4 +56,16 @@ export default (state = initialState, action = {}) => {
 // action creators
 export const setLoading = () => ({ type: LOADING });
 export const setFailed = () => ({ type: FAIL });
-export const setSuccess = () => ({ type: SUCCESS });
+export const setSuccess = (payload) => ({ type: SUCCESS, payload });
+
+export const getSwapiPerson = (id) => (dispatch) => {
+    dispatch(setLoading());
+
+    return window.fetch(`https://swapi.co/api/people/${id}`)
+        .then(response => response.json())
+        .then(data => dispatch(setSuccess(data)))
+        .catch(() => {
+            dispatch(setFailed());
+            return PRELOAD_FAIL; // let Preload Link know the fetch failed.
+        });
+};

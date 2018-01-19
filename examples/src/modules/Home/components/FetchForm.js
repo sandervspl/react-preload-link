@@ -1,49 +1,31 @@
 import React from 'react';
 import PT from 'prop-types';
 
+const Checkbox = ({ checked, onChange, id, name }) => (
+    <div>
+        <input
+            type="checkbox"
+            name="starwars-person"
+            value={id}
+            id={`person${id}`}
+            onChange={onChange}
+            checked={checked}
+        />
+        <label htmlFor={`person${id}`}>{name}</label>
+    </div>
+);
+
 // eslint-disable-next-line object-curly-newline
-const FetchForm = ({ personId, setPersonId }) => (
+const FetchForm = ({ personIdList, setPersonId }) => (
     <form>
-        <div>
-            <input
-                type="radio"
-                name="starwars-person"
-                value="1"
-                id="person1"
-                onChange={setPersonId}
-                checked={personId === '1'}
-            />
-            <label htmlFor="person1">Luke Skywalker</label>
-        </div>
-
-        <div>
-            <input
-                type="radio"
-                name="starwars-person"
-                value="2"
-                id="person2"
-                onChange={setPersonId}
-                checked={personId === '2'}
-            />
-            <label htmlFor="person2">C-3PO</label>
-        </div>
-
-        <div>
-            <input
-                type="radio"
-                name="starwars-person"
-                value="3"
-                id="person3"
-                onChange={setPersonId}
-                checked={personId === '3'}
-            />
-            <label htmlFor="person3">R2-D2</label>
-        </div>
+        <Checkbox id={'1'} checked={personIdList.includes('1')} onChange={setPersonId} name="Luke Skywalker" />
+        <Checkbox id={'2'} checked={personIdList.includes('2')} onChange={setPersonId} name="C-3PO" />
+        <Checkbox id={'3'} checked={personIdList.includes('3')} onChange={setPersonId} name="R2-D2" />
     </form>
 );
 
 FetchForm.propTypes = {
-    personId: PT.string,
+    personIdList: PT.arrayOf(PT.string),
     setPersonId: PT.func,
 };
 

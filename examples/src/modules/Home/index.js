@@ -3,7 +3,8 @@ import PT from 'prop-types';
 import PreloadLink from 'react-preload-link';
 import { connect } from 'react-redux';
 import { Route } from 'react-router-dom';
-import { setSuccess, setLoading, setFailed, getSwapiPerson } from '../../ducks/app';
+import { setSuccess, setLoading, setFailed } from '../../ducks/app';
+import { getSwapiPerson } from '../../ducks/swapi';
 
 import TimeoutForm from './components/TimeoutForm';
 import NotificationBar from './components/NotificationBar';
@@ -17,7 +18,7 @@ class Home extends React.Component {
             value: 1000,
         },
         succeed: true,
-        personId: '1',
+        personIdList: ['1'],
         message: '',
     }
 
@@ -40,11 +41,18 @@ class Home extends React.Component {
     }
 
     setPersonId = (e) => {
+        const { personIdList } = this.state;
         const { value } = e.currentTarget;
+
+        const hasPersonId = personIdList.find(id => id === value);
+
+        const newList = hasPersonId !== value
+            ? [...personIdList, value]
+            : personIdList.filter(id => id !== value);
 
         this.setState((state) => ({
             ...state,
-            personId: value,
+            personIdList: newList,
         }));
     }
 
@@ -70,14 +78,19 @@ class Home extends React.Component {
         defaultDone();
     }
 
+    loadPersonList = () => (
+        this.state.personIdList.map(id => () => this.props.getSwapiPerson(id))
+    )
+
     render() {
-        const { message, personId } = this.state;
+        const { message, personIdList } = this.state;
         const { app } = this.props;
         const fn = this.useFn();
+        const loadList = this.loadPersonList();
 
         return (
             <div>
-                {app.error && (<NotificationBar />)}
+                {app.error && <NotificationBar />}
 
                 <div className="content">
                     <h1>Preload Link Examples</h1>
@@ -110,13 +123,13 @@ class Home extends React.Component {
                     <h2>Fetch</h2>
 
                     <PreloadLink
-                        to={`/profile/${personId}`}
-                        load={() => this.props.getSwapiPerson(personId)}
+                        to={`/profile/${personIdList}`}
+                        load={loadList}
                     >
                         <p>To Star Wars person page</p>
                     </PreloadLink>
 
-                    <FetchForm personId={personId} setPersonId={this.setPersonId} />
+                    <FetchForm personIdList={personIdList} setPersonId={this.setPersonId} />
                 </div>
             </div>
         );

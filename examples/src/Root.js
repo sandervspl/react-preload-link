@@ -22,7 +22,7 @@ PreloadLinkInit({
 const Routes = () => (
     <Switch>
         <Route exact path="/(|inline-content)" component={Home} />
-        <Route path="/profile" component={Profile} />
+        <Route path="/profile/:id" component={Profile} />
     </Switch>
 );
 

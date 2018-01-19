@@ -1,42 +1,54 @@
 import React from 'react';
 import PT from 'prop-types';
 import { connect } from 'react-redux';
-import { getSwapiPerson } from '../../ducks/app';
+import { getSwapiPerson } from '../../ducks/swapi';
 
 class Profile extends React.Component {
     componentDidMount() {
-        const { app, match: { params } } = this.props;
+        const { swapi, match: { params } } = this.props;
 
-        if (!app.person) {
-            this.props.getSwapiPerson(params.id);
+        const idList = params.id.split(',');
+
+        if (swapi.people.length === 0) {
+            idList.forEach(id => this.props.getSwapiPerson(id));
         }
     }
 
     render() {
-        const { app } = this.props;
+        const { swapi } = this.props;
 
         return (
             <div className="content">
                 <h1>Profile</h1>
-                {app.person && (
-                    <ul>
-                        {Object.keys(app.person).map((key) => (
-                            <li key={key}>{app.person[key]}</li>
-                        ))}
-                    </ul>
-                )}
+                {swapi.loading && <p>Loading...</p>}
+
+                {swapi.people.length > 0 && swapi.people.map((person) => (
+                    <React.Fragment key={person.name}>
+                        <h2>{person.name}</h2>
+                        <ul>
+                            {Object.keys(person).map((key) => (
+                                <li key={key}>{person[key]}</li>
+                            ))}
+                        </ul>
+                    </React.Fragment>
+                ))}
             </div>
         );
     }
 }
 
 Profile.propTypes = {
-    app: PT.object,
+    swapi: PT.shape({
+        people: PT.arrayOf(PT.object),
+    }),
+    match: PT.shape({
+        params: PT.object,
+    }),
     getSwapiPerson: PT.func,
 };
 
 const mapStateToProps = (state) => ({
-    app: state.app,
+    swapi: state.swapi,
 });
 
 export default connect(mapStateToProps, { getSwapiPerson })(Profile);
