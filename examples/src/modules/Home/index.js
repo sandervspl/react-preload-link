@@ -1,6 +1,6 @@
 import React from 'react';
 import PT from 'prop-types';
-import PreloadLink from 'react-preload-link';
+import PreloadLink, { PRELOAD_FAIL } from 'react-preload-link';
 import { connect } from 'react-redux';
 import { Route } from 'react-router-dom';
 import { setSuccess, setLoading, setFailed } from '../../ducks/app';
@@ -61,7 +61,7 @@ class Home extends React.Component {
     )
 
     asyncFnFail = () => (
-        new Promise((_, reject) => setTimeout(() => reject(), this.state.waitTime.value))
+        new Promise((_, reject) => setTimeout(() => reject(PRELOAD_FAIL), this.state.waitTime.value))
     )
 
     useFn = () => (

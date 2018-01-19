@@ -94,10 +94,11 @@ class PreloadLink extends React.Component {
     // prepares the page transition. Wait on all promises to resolve before changing route.
     prepareNavigation = () => {
         const { load } = this.props;
+        const isArray = Array.isArray(load);
         let toLoad;
 
         // create functions of our load props
-        if (Array.isArray(load)) {
+        if (isArray) {
             const loadList = load.map(fn => fn());
             toLoad = Promise.all(loadList);
         } else {
@@ -108,8 +109,13 @@ class PreloadLink extends React.Component {
         // set in- and external loading states and proceed to navigation if successful
         toLoad
             .then((result) => {
-                if (result === PRELOAD_FAIL) {
+                const preloadFailed = isArray
+                    ? result.includes(PRELOAD_FAIL)
+                    : result === PRELOAD_FAIL;
+
+                if (preloadFailed) {
                     this.update(SET_FAILED);
+                    this.setLoaded();
                 } else {
                     this.update(SET_SUCCESS);
                     this.setLoaded(() => this.navigate());
