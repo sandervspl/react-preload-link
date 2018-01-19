@@ -98,14 +98,13 @@ class Home extends React.Component {
                         <p>Complex link with custom lifecycle methods</p>
                     </PreloadLink>
 
-                    {message && <p>{message}</p>}
-
                     <TimeoutForm
                         {...this.state}
                         setWaitTime={this.setWaitTime}
                         setSucceed={this.setSucceed}
                     />
 
+                    {message && <p>{message}</p>}
                     <Route path="/inline-content" component={InlineContent} />
 
                     <h2>Fetch</h2>
