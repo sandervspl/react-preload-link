@@ -94,11 +94,11 @@ class Home extends React.Component {
             <React.Fragment>
                 {app.error && <NotificationBar />}
 
-                <div className="content">
+                <div className="content page">
                     <h2>Timeout</h2>
 
-                    <div className="content">
-                        <PreloadLink to="/inline-content" load={fn}>
+                    <div className="content inner">
+                        <PreloadLink to="/page2" load={fn}>
                             <p>Simple link</p>
                         </PreloadLink>
 
@@ -124,7 +124,7 @@ class Home extends React.Component {
 
                     <h2>Fetch</h2>
 
-                    <div className="content">
+                    <div className="content inner">
                         <FetchForm personIdList={personIdList} setPersonId={this.setPersonId} />
 
                         <button disabled={personIdList.length === 0}>

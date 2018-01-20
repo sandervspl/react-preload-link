@@ -12,6 +12,7 @@ import { setFailed, setLoading, setSuccess } from './ducks/app';
 
 import Home from './modules/Home';
 import Profile from './modules/Profile';
+import Page2 from './modules/Page2';
 
 NProgress.configure({
     showSpinner: false,
@@ -29,34 +30,42 @@ const App = () => (
     <main>
         <header>
             <Link to="/">
-                <h1>Preload Link Examples</h1>
+                <h1>React Preload Link</h1>
             </Link>
         </header>
 
-        <div className="subheader content">
-            <a
-                id="github-stars-button"
-                className="github-button"
-                data-size="large"
-                href="https://github.com/sandervspl/react-preload-link"
-                data-count-href="/sandervspl/react-preload-link/stargazers"
-                data-count-api="/repos/sandervspl/react-preload-link#stargazers_count"
-                data-count-aria-label="# stargazers on GitHub"
-                aria-label="Star sandervspl/react-preload-link on GitHub"
-            >
-                Star
-            </a>
+        <div className="subheader">
+            <div className="content">
+                <a
+                    id="github-stars-button"
+                    className="github-button"
+                    data-size="large"
+                    href="https://github.com/sandervspl/react-preload-link"
+                    data-count-href="/sandervspl/react-preload-link/stargazers"
+                    data-count-api="/repos/sandervspl/react-preload-link#stargazers_count"
+                    data-count-aria-label="# stargazers on GitHub"
+                    aria-label="Star sandervspl/react-preload-link on GitHub"
+                >
+                    Star on Github
+                </a>
+                <div className="description">
+                    React Preload Link is a <a href="https://github.com/facebook/react">React</a> component built on the <a href="https://github.com/ReactTraining/react-router">React Router</a> Link that waits on all your data to load before navigating.
+                </div>
+            </div>
         </div>
 
         <Switch>
             <Route exact path="/(|inline-content)" component={Home} />
             <Route path="/profile/:id" component={Profile} />
+            <Route path="/page2" component={Page2} />
         </Switch>
 
-        <div className="footer content">
-            <span className="copyright">
-                Copyright &copy; <a href="#">Sander Vispoel</a> {new Date().getFullYear()}
-            </span>
+        <div className="footer">
+            <div className="content">
+                <span className="copyright">
+                    Copyright &copy; <a href="https://github.com/sandervspl">Sander Vispoel</a> {new Date().getFullYear()}
+                </span>
+            </div>
         </div>
     </main>
 );
