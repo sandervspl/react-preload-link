@@ -19,16 +19,20 @@ class Profile extends React.Component {
 
         return (
             <div className="content">
-                <h1>Profile</h1>
                 {swapi.loading && <p>Loading...</p>}
 
                 {swapi.people.length > 0 && swapi.people.map((person) => (
                     <React.Fragment key={person.name}>
                         <h2>{person.name}</h2>
                         <ul>
-                            {Object.keys(person).map((key) => (
-                                <li key={key}>{person[key]}</li>
-                            ))}
+                            {Object.keys(person)
+                                .filter(key => person[key] && !Array.isArray(person[key]))
+                                .map((key) => (
+                                    <li key={key}>
+                                        <span className="property">{key.replace('_', ' ')}</span>
+                                        <span className="value">{person[key]}</span>
+                                    </li>
+                                ))}
                         </ul>
                     </React.Fragment>
                 ))}

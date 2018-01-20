@@ -91,51 +91,53 @@ class Home extends React.Component {
         const loadList = this.loadPersonList();
 
         return (
-            <div>
+            <React.Fragment>
                 {app.error && <NotificationBar />}
 
                 <div className="content">
-                    <h1>Preload Link Examples</h1>
-
                     <h2>Timeout</h2>
 
-                    <PreloadLink to="/inline-content" load={fn}>
-                        <p>Simple link</p>
-                    </PreloadLink>
+                    <div className="content">
+                        <PreloadLink to="/inline-content" load={fn}>
+                            <p>Simple link</p>
+                        </PreloadLink>
 
-                    <PreloadLink
-                        to="/inline-content"
-                        load={fn}
-                        setSuccess={this.customDone}
-                        setFailed={this.customDone}
-                        setLoading={this.customLoading}
-                    >
-                        <p>Complex link with custom lifecycle methods</p>
-                    </PreloadLink>
+                        <PreloadLink
+                            to="/inline-content"
+                            load={fn}
+                            setSuccess={this.customDone}
+                            setFailed={this.customDone}
+                            setLoading={this.customLoading}
+                        >
+                            <p>Complex link with custom lifecycle methods</p>
+                        </PreloadLink>
 
-                    <TimeoutForm
-                        {...this.state}
-                        setWaitTime={this.setWaitTime}
-                        setSucceed={this.setSucceed}
-                    />
+                        <TimeoutForm
+                            {...this.state}
+                            setWaitTime={this.setWaitTime}
+                            setSucceed={this.setSucceed}
+                        />
 
-                    {message && <p>{message}</p>}
-                    <Route path="/inline-content" component={InlineContent} />
+                        {message && <p>{message}</p>}
+                        <Route path="/inline-content" component={InlineContent} />
+                    </div>
 
                     <h2>Fetch</h2>
 
-                    <PreloadLink
-                        to={`/profile/${personIdList}`}
-                        load={loadList}
-                    >
-                        <button disabled={personIdList.length === 0}>
-                            To Star Wars person page
-                        </button>
-                    </PreloadLink>
+                    <div className="content">
+                        <FetchForm personIdList={personIdList} setPersonId={this.setPersonId} />
 
-                    <FetchForm personIdList={personIdList} setPersonId={this.setPersonId} />
+                        <button disabled={personIdList.length === 0}>
+                            <PreloadLink
+                                to={`/profile/${personIdList}`}
+                                load={loadList}
+                            >
+                                To Star Wars person page
+                            </PreloadLink>
+                        </button>
+                    </div>
                 </div>
-            </div>
+            </React.Fragment>
         );
     }
 }

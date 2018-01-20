@@ -1,19 +1,158 @@
+* {
+    box-sizing: border-box;
+}
+
 body, html {
     margin: 0;
     padding: 0;
+    font-family: 'Roboto Slab', serif;
+    font-size: .95em;
+}
+
+header {
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+    width: 100%;
+    background-color: cornflowerblue;
+}
+
+header h1 {
+    margin: 0;
+    color: #fff;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+}
+
+h1 {
+    font-size: 1.8em;
+}
+
+h2 {
+    padding: 10px;
+    background-color: #2d2d2d;
+    color: #fff;
+    font-size: 1.25em;
+}
+
+button {
+    all: unset;
+    background-color: cornflowerblue;
+}
+
+a {
+    all: unset;
+    cursor: pointer;
+    text-decoration: underline;
+    color: cornflowerblue;
+}
+
+button a {
+    display: block;
+    padding: 5px 10px;
+    color: #fff;
+    text-decoration: none;
+}
+
+button:disabled {
+    background-color: rgba(100, 149, 237, 0.56);
+}
+
+ul {
+    padding-left: 20px;
+}
+
+li {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 5px;
+    font-size: .75em;
+}
+
+li .property {
+    display: inline-block;
+    min-width: 100px;
+    margin-right: 5px;
+}
+
+#nprogress .bar {
+    height: 3px;
+    background-color: #fff;
+}
+
+#nprogress .peg {
+    box-shadow: none;
+    -webkit-transform: none;
+    -ms-transform: none;
+    transform: none;
 }
 
 .notification-bar {
     padding: 10px;
     background: #eee;
     color: #fff;
-    font-family: roboto, arial, 'sans-serif';
+    font-size: 12px;
 }
 
 .notification-bar.error {
-    background: #d20e19;
+    background: orangered;
 }
 
 .content {
-    padding: 20px;
+    padding: 0 15px;
+    width: 100%;
+    max-width: 1000px;
+    text-align: left;
+}
+
+.fetch-form {
+    margin-bottom: 10px;
+}
+
+.subheader, .footer {
+    display: flex;
+    justify-content: center;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    width: 100%;
+    background-color: #eee;
+}
+
+.footer {
+    margin-top: auto;
+}
+
+.subheader .content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.copyright {
+    color: #5c5c5c;
+    font-size: .85em;
+}
+
+@media only screen and (min-width: 1024px) {
+    body, html, li {
+        font-size: 1em;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    h2 {
+        font-size: 1.5em;
+    }
+
+    .content {
+        padding: 0 20px;
+        width: 66%;
+    }
 }

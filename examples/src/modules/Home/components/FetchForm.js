@@ -17,7 +17,7 @@ const Checkbox = ({ checked, onChange, id, name }) => (
 
 // eslint-disable-next-line object-curly-newline
 const FetchForm = ({ personIdList, setPersonId }) => (
-    <form>
+    <form className="fetch-form">
         <Checkbox id={'1'} checked={personIdList.includes('1')} onChange={setPersonId} name="Luke Skywalker" />
         <Checkbox id={'2'} checked={personIdList.includes('2')} onChange={setPersonId} name="C-3PO" />
         <Checkbox id={'3'} checked={personIdList.includes('3')} onChange={setPersonId} name="R2-D2" />
