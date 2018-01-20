@@ -24,18 +24,8 @@ class PreloadLink extends React.Component {
         PreloadLink[SET_FAILED] = setFailed;
     }
 
-    constructor(props) {
-        super(props);
-
-        if (!PreloadLink[SET_LOADING]
-            || !PreloadLink[SET_SUCCESS]
-            || !PreloadLink[SET_FAILED]) {
-            throw Error(`Not all lifecycle methods have been defined an action for PreloadLink. You can do this by importing 'PreloadLinkInit' once and defining an object with 'action' for all properties: ${SET_LOADING}, ${SET_SUCCESS}, ${SET_FAILED} (i.e. { action: someFunction }.`);
-        }
-
-        this.state = {
-            loading: false,
-        };
+    state = {
+        loading: false,
     }
 
     setLoading = (callback = noop) => this.setState({ loading: true }, () => callback());
@@ -48,7 +38,12 @@ class PreloadLink extends React.Component {
         // execution of lifecycle methods
         const execute = (fn) => {
             if (!fn) return;
-            fn();
+
+            if (typeof fn !== 'function') {
+                console.error(`PreloadLink: Method for lifecycle '${state}' is not a function.`);
+            } else {
+                fn();
+            }
         };
 
         // update state and call lifecycle method
