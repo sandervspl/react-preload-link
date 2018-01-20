@@ -61,7 +61,9 @@ class Home extends React.Component {
     )
 
     asyncFnFail = () => (
-        new Promise((_, reject) => setTimeout(() => reject(PRELOAD_FAIL), this.state.waitTime.value))
+        new Promise((_, reject) => (
+            setTimeout(() => reject(PRELOAD_FAIL), this.state.waitTime.value)
+        ))
     )
 
     useFn = () => (
@@ -126,7 +128,9 @@ class Home extends React.Component {
                         to={`/profile/${personIdList}`}
                         load={loadList}
                     >
-                        <p>To Star Wars person page</p>
+                        <button disabled={personIdList.length === 0}>
+                            To Star Wars person page
+                        </button>
                     </PreloadLink>
 
                     <FetchForm personIdList={personIdList} setPersonId={this.setPersonId} />
