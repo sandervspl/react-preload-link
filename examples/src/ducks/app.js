@@ -1,5 +1,3 @@
-import Progress from 'react-progress-2';
-
 // action constants
 export const LOADING = 'app/LOADING';
 export const FAIL = 'app/FAIL';
@@ -16,38 +14,29 @@ export const initialState = {
 /* eslint-disable indent */
 export default (state = initialState, action = {}) => {
     switch (action.type) {
-        case LOADING: {
-            if (!state.loading) Progress.show();
-
+        case LOADING:
             return {
                 ...state,
                 loading: true,
                 error: false,
                 success: false,
             };
-        }
 
-        case FAIL: {
-            Progress.hideAll();
-
+        case FAIL:
             return {
                 ...state,
                 loading: false,
                 error: true,
                 success: false,
             };
-        }
 
-        case SUCCESS: {
-            Progress.hideAll();
-
+        case SUCCESS:
             return {
                 ...state,
                 loading: false,
                 error: false,
                 success: true,
             };
-        }
 
         default:
             return state;

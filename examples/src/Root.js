@@ -3,8 +3,6 @@ import React from 'react';
 import { Route, Switch, BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { PreloadLinkInit } from 'react-preload-link';
-import Progress from 'react-progress-2';
-import 'react-progress-2/main.css';
 import './styles/main.css';
 
 import Store from './Store';
@@ -29,10 +27,7 @@ const Routes = () => (
 const Root = () => (
     <Provider store={Store}>
         <BrowserRouter>
-            <div>
-                <Progress.Component />
-                <Route path="/" component={Routes} />
-            </div>
+            <Route path="/" component={Routes} />
         </BrowserRouter>
     </Provider>
 );
