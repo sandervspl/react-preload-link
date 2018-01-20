@@ -1,3 +1,5 @@
+import NProgress from 'nprogress';
+
 // action constants
 export const LOADING = 'app/LOADING';
 export const FAIL = 'app/FAIL';
@@ -14,29 +16,38 @@ export const initialState = {
 /* eslint-disable indent */
 export default (state = initialState, action = {}) => {
     switch (action.type) {
-        case LOADING:
+        case LOADING: {
+            NProgress.start();
+
             return {
                 ...state,
                 loading: true,
                 error: false,
                 success: false,
             };
+        }
 
-        case FAIL:
+        case FAIL: {
+            NProgress.done();
+
             return {
                 ...state,
                 loading: false,
                 error: true,
                 success: false,
             };
+        }
 
-        case SUCCESS:
+        case SUCCESS: {
+            NProgress.done();
+
             return {
                 ...state,
                 loading: false,
                 error: false,
                 success: true,
             };
+        }
 
         default:
             return state;
