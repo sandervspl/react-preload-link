@@ -20,9 +20,9 @@ NProgress.configure({
 });
 
 PreloadLinkInit({
-    setFailed: { action: setFailed },
-    setLoading: { action: setLoading },
-    setSuccess: { action: setSuccess },
+    setFailed: () => Store.dispatch(setFailed()),
+    setLoading: () => Store.dispatch(setLoading()),
+    setSuccess: () => Store.dispatch(setSuccess()),
 });
 
 const Routes = () => (

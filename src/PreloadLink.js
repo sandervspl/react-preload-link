@@ -1,8 +1,6 @@
 import React from 'react';
 import PT from 'prop-types';
 import { withRouter, Link } from 'react-router-dom';
-import { connect } from 'react-redux';
-import { compose } from 'redux';
 
 const noop = () => {};
 
@@ -18,26 +16,20 @@ class PreloadLink extends React.Component {
     static [SET_LOADING];
     static [SET_SUCCESS];
     static [SET_FAILED];
-    static defaultLifecycleOptions = {
-        action: null,
-        dispatch: true,
-    };
 
     // Initialize the lifecycle functions of page loading.
     static init = ({ setLoading, setSuccess, setFailed }) => {
-        const options = PreloadLink.defaultLifecycleOptions;
-
-        PreloadLink[SET_LOADING] = { ...options, ...setLoading };
-        PreloadLink[SET_SUCCESS] = { ...options, ...setSuccess };
-        PreloadLink[SET_FAILED] = { ...options, ...setFailed };
+        PreloadLink[SET_LOADING] = setLoading;
+        PreloadLink[SET_SUCCESS] = setSuccess;
+        PreloadLink[SET_FAILED] = setFailed;
     }
 
     constructor(props) {
         super(props);
 
-        if (!PreloadLink[SET_LOADING].action
-            || !PreloadLink[SET_SUCCESS].action
-            || !PreloadLink[SET_FAILED].action) {
+        if (!PreloadLink[SET_LOADING]
+            || !PreloadLink[SET_SUCCESS]
+            || !PreloadLink[SET_FAILED]) {
             throw Error(`Not all lifecycle methods have been defined an action for PreloadLink. You can do this by importing 'PreloadLinkInit' once and defining an object with 'action' for all properties: ${SET_LOADING}, ${SET_SUCCESS}, ${SET_FAILED} (i.e. { action: someFunction }.`);
         }
 
@@ -46,41 +38,26 @@ class PreloadLink extends React.Component {
         };
     }
 
-    setLoading = (callback = noop) => (this.setState({ loading: true }, () => callback()));
-    setLoaded = (callback = noop) => (this.setState({ loading: false }, () => callback()));
+    setLoading = (callback = noop) => this.setState({ loading: true }, () => callback());
+    setLoaded = (callback = noop) => this.setState({ loading: false }, () => callback());
 
     // update fetch state and execute lifecycle methods
     update = (state) => {
-        const { dispatch } = this.props;
         const method = PreloadLink[state];
 
         // execution of lifecycle methods
-        // scoped as it's only relevant in update()
         const execute = (fn) => {
-            const isFn = typeof fn === 'function';
-
-            if (!isFn && !fn.type) {
-                throw Error(`Lifecycle method for '${state}' is not a function nor a valid Redux action. Property 'type' is missing.`);
-            }
-
-            if (method.dispatch) {
-                dispatch(isFn ? fn() : fn);
-            } else {
-                if (!isFn) {
-                    throw Error(`Lifecycle method for '${state}' should be a function if 'dispatch' is set to false.`);
-                }
-
-                fn();
-            }
+            if (!fn) return;
+            fn();
         };
 
         // update state and call lifecycle method
         if (this.props[state]) {
             // the override prop returns a function with the default lifecycle method as param.
-            this.props[state](() => execute(method.action));
+            this.props[state](() => execute(method));
             this.setLoading();
         } else {
-            this.setLoading(() => execute(method.action));
+            this.setLoading(() => execute(method));
         }
     }
 
@@ -153,7 +130,6 @@ class PreloadLink extends React.Component {
 
 PreloadLink.propTypes = {
     children: PT.any,
-    dispatch: PT.func,
     history: PT.shape({
         // eslint-disable-next-line react/no-unused-prop-types
         push: PT.func,
@@ -177,7 +153,4 @@ PreloadLink.defaultProps = {
 export const PreloadLinkInit = PreloadLink.init;
 
 // component
-export default compose(
-    withRouter,
-    connect(),
-)(PreloadLink);
+export default withRouter(PreloadLink);
