@@ -2,14 +2,13 @@ import React from 'react';
 import PT from 'prop-types';
 import PreloadLink, { PRELOAD_FAIL } from 'react-preload-link';
 import { connect } from 'react-redux';
-import { Route } from 'react-router-dom';
 import { setSuccess, setLoading, setFailed } from '../../ducks/app';
 import { getSwapiPerson } from '../../ducks/swapi';
 
 import TimeoutForm from './components/TimeoutForm';
 import NotificationBar from './components/NotificationBar';
 import FetchForm from './components/FetchForm';
-import InlineContent from '../InlineContent';
+import Countdown from './components/Countdown';
 
 class Home extends React.Component {
     state = {
@@ -19,7 +18,7 @@ class Home extends React.Component {
         },
         succeed: true,
         personIdList: ['1'],
-        message: '',
+        countdown: false,
     }
 
     setWaitTime = (e) => {
@@ -71,12 +70,12 @@ class Home extends React.Component {
     )
 
     customLoading = (defaultLoading) => {
-        this.setState({ message: 'Loading...' });
+        this.setState({ countdown: true });
         defaultLoading();
     }
 
     customDone = (defaultDone) => {
-        this.setState({ message: '' });
+        this.setState({ countdown: false });
         defaultDone();
     }
 
@@ -85,7 +84,7 @@ class Home extends React.Component {
     )
 
     render() {
-        const { message, personIdList } = this.state;
+        const { countdown, personIdList, waitTime } = this.state;
         const { app } = this.props;
         const fn = this.useFn();
         const loadList = this.loadPersonList();
@@ -98,28 +97,27 @@ class Home extends React.Component {
                     <h2>Timeout</h2>
 
                     <div className="content inner">
-                        <PreloadLink to="/page2" load={fn}>
-                            <p>Simple link</p>
-                        </PreloadLink>
-
-                        <PreloadLink
-                            to="/inline-content"
-                            load={fn}
-                            setSuccess={this.customDone}
-                            setFailed={this.customDone}
-                            setLoading={this.customLoading}
-                        >
-                            <p>Complex link with custom lifecycle methods</p>
-                        </PreloadLink>
-
                         <TimeoutForm
                             {...this.state}
                             setWaitTime={this.setWaitTime}
                             setSucceed={this.setSucceed}
                         />
 
-                        {message && <p>{message}</p>}
-                        <Route path="/inline-content" component={InlineContent} />
+                        <PreloadLink to="/page2" load={fn}>
+                            <p>Link</p>
+                        </PreloadLink>
+
+                        <PreloadLink
+                            to="/page2"
+                            load={fn}
+                            setLoading={this.customLoading}
+                            setSuccess={this.customDone}
+                            setFailed={this.customDone}
+                        >
+                            <p>Advanced link</p>
+                        </PreloadLink>
+
+                        {countdown && <Countdown count={waitTime.value / 1000} />}
                     </div>
 
                     <h2>Fetch</h2>

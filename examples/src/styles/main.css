@@ -45,6 +45,11 @@ h2 {
     font-size: 1.25em;
 }
 
+h3 {
+    padding: 5px;
+    background-color: #eee;
+}
+
 button {
     all: unset;
     background-color: cornflowerblue;
@@ -85,6 +90,15 @@ li .property {
     margin-right: 5px;
 }
 
+form {
+    background-color: lightblue;
+    padding: 10px;
+}
+
+form h4 {
+    margin: 0 0 10px;
+}
+
 #nprogress .bar {
     height: 3px;
     background-color: #fff;
@@ -99,6 +113,7 @@ li .property {
 
 .notification-bar {
     padding: 10px;
+    width: 100%;
     background: #eee;
     color: #fff;
     font-size: 12px;
@@ -121,6 +136,15 @@ li .property {
 
 .fetch-form {
     margin-bottom: 10px;
+}
+
+.timeout-form .inner {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.timeout-form div:not(:last-child) {
+    margin-right: 20px;
 }
 
 .subheader, .footer {
@@ -158,7 +182,7 @@ li .property {
 }
 
 .description a {
-    color: #9c9c9c;
+    color: #888888;
 }
 
 @media only screen and (min-width: 1024px) {

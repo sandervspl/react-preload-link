@@ -55,7 +55,7 @@ const App = () => (
         </div>
 
         <Switch>
-            <Route exact path="/(|inline-content)" component={Home} />
+            <Route exact path="/" component={Home} />
             <Route path="/profile/:id" component={Profile} />
             <Route path="/page2" component={Page2} />
         </Switch>
