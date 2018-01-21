@@ -1,3 +1,4 @@
+/* eslint-disable */
 const npsUtils = require('nps-utils');
 const path = require('path');
 const series = npsUtils.series;
