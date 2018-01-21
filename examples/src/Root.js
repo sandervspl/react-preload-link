@@ -5,7 +5,6 @@ import { Provider } from 'react-redux';
 import { PreloadLinkInit } from 'react-preload-link';
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
-import './styles/main.css';
 
 import Store from './Store';
 import { setFailed, setLoading, setSuccess } from './ducks/app';
