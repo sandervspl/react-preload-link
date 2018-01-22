@@ -19,10 +19,10 @@ YARN
 yarn add react-preload-link
 ```
 
-```js
-import Select from 'react-select';
-```
-
 ## Usage
+
+```js
+import PreloadLink from 'react-preload-link';
+```
 
 🚧
