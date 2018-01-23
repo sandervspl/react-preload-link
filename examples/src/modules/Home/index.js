@@ -85,12 +85,9 @@ class Home extends React.Component {
 
     render() {
         const { countdown, personIdList, waitTime } = this.state;
-        const { app, location } = this.props;
+        const { app } = this.props;
         const fn = this.useFn();
         const loadList = this.loadPersonList();
-
-        let path = location.pathname === '/' ? '' : location.pathname;
-        path = path[path.length - 1] === '/' ? path.slice(path.length - 1) : path;
 
         return (
             <React.Fragment>
@@ -106,18 +103,29 @@ class Home extends React.Component {
                             setSucceed={this.setSucceed}
                         />
 
-                        <PreloadLink to={`${path}/page2`} load={fn}>
+                        <PreloadLink to="page2" load={fn}>
                             <p>Link</p>
                         </PreloadLink>
 
                         <PreloadLink
-                            to={`${path}/page2`}
+                            to="page2"
                             load={fn}
                             setLoading={this.customLoading}
                             setSuccess={this.customDone}
                             setFailed={this.customDone}
                         >
                             <p>Advanced link</p>
+                        </PreloadLink>
+
+                        <PreloadLink
+                            to="page2"
+                            load={fn}
+                            setLoading={this.customLoading}
+                            setSuccess={this.customDone}
+                            setFailed={this.customDone}
+                            noInterrupt
+                        >
+                            <p>Uninteruptable link</p>
                         </PreloadLink>
 
                         {countdown && <Countdown count={waitTime.value / 1000} />}
@@ -130,7 +138,7 @@ class Home extends React.Component {
 
                         <button disabled={personIdList.length === 0}>
                             <PreloadLink
-                                to={`${path}/profile/${personIdList}`}
+                                to={`profile/${personIdList}`}
                                 load={loadList}
                             >
                                 To Star Wars person page

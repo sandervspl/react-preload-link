@@ -19,6 +19,7 @@ class PreloadLink extends React.Component {
         uid: 0,
         busy: false,
         cancelUid: 0,
+        canCancel: true,
     };
 
     // Initialize the lifecycle functions of page loading.
@@ -26,7 +27,6 @@ class PreloadLink extends React.Component {
         PreloadLink[SET_LOADING] = options.setLoading;
         PreloadLink[SET_SUCCESS] = options.setSuccess;
         PreloadLink[SET_FAILED] = options.setFailed;
-        PreloadLink.canOverrideLoad = options.canOverrideLoad || true;
     }
 
     constructor(props) {
@@ -40,10 +40,14 @@ class PreloadLink extends React.Component {
     }
 
     setLoading = (callback = noop) => {
-        const { canOverrideLoad, process } = PreloadLink;
+        const { process } = PreloadLink;
+        const { noInterrupt } = this.props;
 
-        if (canOverrideLoad && process.busy && process.uid !== this.uid) {
+        if (!noInterrupt && process.busy && process.uid !== this.uid) {
             process.cancelUid = process.uid;
+        } else if (noInterrupt) {
+            // any further clicks can not cancel this process
+            process.canCancel = false;
         }
 
         PreloadLink.process = {
@@ -56,6 +60,11 @@ class PreloadLink extends React.Component {
     }
 
     setLoaded = (callback = noop) => {
+        // reset for further navigation
+        if (!PreloadLink.process.canCancel) {
+            PreloadLink.process.canCancel = true;
+        }
+
         PreloadLink.process = {
             ...PreloadLink.process,
             uid: 0,
@@ -99,7 +108,7 @@ class PreloadLink extends React.Component {
 
     // prepares the page transition. Wait on all promises to resolve before changing route.
     prepareNavigation = () => {
-        const { process, canOverrideLoad } = PreloadLink;
+        const { process } = PreloadLink;
         const { load } = this.props;
         const isArray = Array.isArray(load);
         let toLoad;
@@ -116,7 +125,8 @@ class PreloadLink extends React.Component {
         // set in- and external loading states and proceed to navigation if successful
         toLoad
             .then((result) => {
-                if (canOverrideLoad && process.cancelUid === this.uid) {
+                // do not perform further navigation if this was ordered for cancel
+                if (process.cancelUid === this.uid) {
                     return;
                 }
 
@@ -140,11 +150,13 @@ class PreloadLink extends React.Component {
     }
 
     handleClick = (e) => {
+        const { process } = PreloadLink;
+
         // prevents navigation
         e.preventDefault();
 
         // prevent navigation if we can't override a load with a new click
-        if (!PreloadLink.canOverrideLoad && PreloadLink.process) return;
+        if (process.busy && !process.canCancel) return;
 
         // fire external loading method
         this.update(SET_LOADING);
@@ -178,12 +190,14 @@ PreloadLink.propTypes = {
     setSuccess: PT.func,
     setFailed: PT.func,
     /* eslint-enable */
+    noInterrupt: PT.bool,
 };
 
 PreloadLink.defaultProps = {
     setLoading: null,
     setSuccess: null,
     setFailed: null,
+    noInterrupt: false,
 };
 
 // component initialization function
