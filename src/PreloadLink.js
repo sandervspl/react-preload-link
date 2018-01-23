@@ -158,12 +158,17 @@ class PreloadLink extends React.Component {
         // prevent navigation if we can't override a load with a new click
         if (process.busy && !process.canCancel) return;
 
-        // fire external loading method
-        this.update(SET_LOADING);
+        if (!this.props.load) {
+            // nothing to load -- we can navigate
+            this.navigate();
+        } else {
+            // fire external loading method
+            this.update(SET_LOADING);
 
-        if (!this.state.loading) {
-            // set internal loading state and prepare to navigate
-            this.setLoading(() => this.prepareNavigation());
+            if (!this.state.loading) {
+                // set internal loading state and prepare to navigate
+                this.setLoading(() => this.prepareNavigation());
+            }
         }
     }
 
@@ -183,7 +188,7 @@ PreloadLink.propTypes = {
         // eslint-disable-next-line react/no-unused-prop-types
         push: PT.func,
     }),
-    load: PT.oneOfType([PT.func, PT.arrayOf(PT.func)]).isRequired,
+    load: PT.oneOfType([PT.func, PT.arrayOf(PT.func)]),
     to: PT.string.isRequired,
     /* eslint-disable react/no-unused-prop-types */
     setLoading: PT.func,
