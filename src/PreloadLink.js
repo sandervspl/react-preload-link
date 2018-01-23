@@ -1,8 +1,7 @@
 import React from 'react';
 import PT from 'prop-types';
 import { withRouter, Link } from 'react-router-dom';
-
-const noop = () => {};
+import { uuid, noop } from './helpers';
 
 // lifecycle constants
 const SET_LOADING = 'setLoading';
@@ -16,20 +15,55 @@ class PreloadLink extends React.Component {
     static [SET_LOADING];
     static [SET_SUCCESS];
     static [SET_FAILED];
+    static process = {
+        uid: 0,
+        busy: false,
+        cancelUid: 0,
+    };
 
     // Initialize the lifecycle functions of page loading.
-    static init = ({ setLoading, setSuccess, setFailed }) => {
-        PreloadLink[SET_LOADING] = setLoading;
-        PreloadLink[SET_SUCCESS] = setSuccess;
-        PreloadLink[SET_FAILED] = setFailed;
+    static init = (options) => {
+        PreloadLink[SET_LOADING] = options.setLoading;
+        PreloadLink[SET_SUCCESS] = options.setSuccess;
+        PreloadLink[SET_FAILED] = options.setFailed;
+        PreloadLink.canOverrideLoad = options.canOverrideLoad || true;
     }
 
-    state = {
-        loading: false,
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            loading: false,
+        };
+
+        this.uid = uuid();
     }
 
-    setLoading = (callback = noop) => this.setState({ loading: true }, () => callback());
-    setLoaded = (callback = noop) => this.setState({ loading: false }, () => callback());
+    setLoading = (callback = noop) => {
+        const { canOverrideLoad, process } = PreloadLink;
+
+        if (canOverrideLoad && process.busy && process.uid !== this.uid) {
+            process.cancelUid = process.uid;
+        }
+
+        PreloadLink.process = {
+            ...process,
+            uid: this.uid,
+            busy: true,
+        };
+
+        this.setState({ loading: true }, () => callback());
+    }
+
+    setLoaded = (callback = noop) => {
+        PreloadLink.process = {
+            ...PreloadLink.process,
+            uid: 0,
+            busy: false,
+        };
+
+        this.setState({ loading: false }, () => callback());
+    }
 
     // update fetch state and execute lifecycle methods
     update = (state) => {
@@ -65,6 +99,7 @@ class PreloadLink extends React.Component {
 
     // prepares the page transition. Wait on all promises to resolve before changing route.
     prepareNavigation = () => {
+        const { process, canOverrideLoad } = PreloadLink;
         const { load } = this.props;
         const isArray = Array.isArray(load);
         let toLoad;
@@ -81,6 +116,10 @@ class PreloadLink extends React.Component {
         // set in- and external loading states and proceed to navigation if successful
         toLoad
             .then((result) => {
+                if (canOverrideLoad && process.cancelUid === this.uid) {
+                    return;
+                }
+
                 const preloadFailed = isArray
                     ? result.includes(PRELOAD_FAIL)
                     : result === PRELOAD_FAIL;
@@ -103,6 +142,9 @@ class PreloadLink extends React.Component {
     handleClick = (e) => {
         // prevents navigation
         e.preventDefault();
+
+        // prevent navigation if we can't override a load with a new click
+        if (!PreloadLink.canOverrideLoad && PreloadLink.process) return;
 
         // fire external loading method
         this.update(SET_LOADING);
