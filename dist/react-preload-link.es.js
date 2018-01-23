@@ -2,6 +2,15 @@ import React from 'react';
 import PT from 'prop-types';
 import { Link, withRouter } from 'react-router-dom';
 
+var idCounter = 0;
+
+var noop = function noop() {};
+
+// eslint-disable-next-line no-plusplus
+var uuid = function uuid() {
+  return ++idCounter;
+};
+
 var asyncGenerator = function () {
   function AwaitValue(value) {
     this.value = value;
@@ -149,6 +158,20 @@ var createClass = function () {
 
 
 
+var _extends = Object.assign || function (target) {
+  for (var i = 1; i < arguments.length; i++) {
+    var source = arguments[i];
+
+    for (var key in source) {
+      if (Object.prototype.hasOwnProperty.call(source, key)) {
+        target[key] = source[key];
+      }
+    }
+  }
+
+  return target;
+};
+
 
 
 var inherits = function (subClass, superClass) {
@@ -185,8 +208,6 @@ var possibleConstructorReturn = function (self, call) {
   return call && (typeof call === "object" || typeof call === "function") ? call : self;
 };
 
-var noop = function noop() {};
-
 // lifecycle constants
 var SET_LOADING = 'setLoading';
 var SET_SUCCESS = 'setSuccess';
@@ -198,30 +219,53 @@ var PRELOAD_FAIL = 'preloadLink/fail';
 var PreloadLink$1 = function (_React$Component) {
     inherits(PreloadLink, _React$Component);
 
-    function PreloadLink() {
-        var _ref;
-
-        var _temp, _this, _ret;
-
+    function PreloadLink(props) {
         classCallCheck(this, PreloadLink);
 
-        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-            args[_key] = arguments[_key];
-        }
+        var _this = possibleConstructorReturn(this, (PreloadLink.__proto__ || Object.getPrototypeOf(PreloadLink)).call(this, props));
 
-        return _ret = (_temp = (_this = possibleConstructorReturn(this, (_ref = PreloadLink.__proto__ || Object.getPrototypeOf(PreloadLink)).call.apply(_ref, [this].concat(args))), _this), _this.state = {
-            loading: false
-        }, _this.setLoading = function () {
+        _this.setLoading = function () {
             var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : noop;
-            return _this.setState({ loading: true }, function () {
+            var process = PreloadLink.process;
+            var noInterrupt = _this.props.noInterrupt;
+
+
+            if (!noInterrupt && process.busy && process.uid !== _this.uid) {
+                process.cancelUid = process.uid;
+            } else if (noInterrupt) {
+                // any further clicks can not cancel this process
+                process.canCancel = false;
+            }
+
+            PreloadLink.process = _extends({}, process, {
+                uid: _this.uid,
+                busy: true
+            });
+
+            _this.setState({ loading: true }, function () {
                 return callback();
             });
-        }, _this.setLoaded = function () {
+        };
+
+        _this.setLoaded = function () {
             var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : noop;
-            return _this.setState({ loading: false }, function () {
+
+            // reset for further navigation
+            if (!PreloadLink.process.canCancel) {
+                PreloadLink.process.canCancel = true;
+            }
+
+            PreloadLink.process = _extends({}, PreloadLink.process, {
+                uid: 0,
+                busy: false
+            });
+
+            _this.setState({ loading: false }, function () {
                 return callback();
             });
-        }, _this.update = function (state) {
+        };
+
+        _this.update = function (state) {
             var method = PreloadLink[state];
 
             // execution of lifecycle methods
@@ -247,14 +291,19 @@ var PreloadLink$1 = function (_React$Component) {
                     return execute(method);
                 });
             }
-        }, _this.navigate = function () {
+        };
+
+        _this.navigate = function () {
             var _this$props = _this.props,
                 history = _this$props.history,
                 to = _this$props.to;
 
 
             history.push(to);
-        }, _this.prepareNavigation = function () {
+        };
+
+        _this.prepareNavigation = function () {
+            var process = PreloadLink.process;
             var load = _this.props.load;
 
             var isArray = Array.isArray(load);
@@ -273,6 +322,11 @@ var PreloadLink$1 = function (_React$Component) {
             // wait for all async functions to resolve
             // set in- and external loading states and proceed to navigation if successful
             toLoad.then(function (result) {
+                // do not perform further navigation if this was ordered for cancel
+                if (process.cancelUid === _this.uid) {
+                    return;
+                }
+
                 var preloadFailed = isArray ? result.includes(PRELOAD_FAIL) : result === PRELOAD_FAIL;
 
                 if (preloadFailed) {
@@ -289,9 +343,17 @@ var PreloadLink$1 = function (_React$Component) {
                 _this.update(SET_FAILED);
                 _this.setLoaded();
             });
-        }, _this.handleClick = function (e) {
+        };
+
+        _this.handleClick = function (e) {
+            var process = PreloadLink.process;
+
             // prevents navigation
+
             e.preventDefault();
+
+            // prevent navigation if we can't override a load with a new click
+            if (process.busy && !process.canCancel) return;
 
             // fire external loading method
             _this.update(SET_LOADING);
@@ -302,7 +364,14 @@ var PreloadLink$1 = function (_React$Component) {
                     return _this.prepareNavigation();
                 });
             }
-        }, _temp), possibleConstructorReturn(_this, _ret);
+        };
+
+        _this.state = {
+            loading: false
+        };
+
+        _this.uid = uuid();
+        return _this;
     }
 
     // Initialize the lifecycle functions of page loading.
@@ -334,14 +403,17 @@ var PreloadLink$1 = function (_React$Component) {
     return PreloadLink;
 }(React.Component);
 
-PreloadLink$1.init = function (_ref2) {
-    var setLoading = _ref2.setLoading,
-        setSuccess = _ref2.setSuccess,
-        setFailed = _ref2.setFailed;
+PreloadLink$1.process = {
+    uid: 0,
+    busy: false,
+    cancelUid: 0,
+    canCancel: true
+};
 
-    PreloadLink$1[SET_LOADING] = setLoading;
-    PreloadLink$1[SET_SUCCESS] = setSuccess;
-    PreloadLink$1[SET_FAILED] = setFailed;
+PreloadLink$1.init = function (options) {
+    PreloadLink$1[SET_LOADING] = options.setLoading;
+    PreloadLink$1[SET_SUCCESS] = options.setSuccess;
+    PreloadLink$1[SET_FAILED] = options.setFailed;
 };
 
 PreloadLink$1.propTypes = {
@@ -355,14 +427,16 @@ PreloadLink$1.propTypes = {
     /* eslint-disable react/no-unused-prop-types */
     setLoading: PT.func,
     setSuccess: PT.func,
-    setFailed: PT.func
+    setFailed: PT.func,
     /* eslint-enable */
+    noInterrupt: PT.bool
 };
 
 PreloadLink$1.defaultProps = {
     setLoading: null,
     setSuccess: null,
-    setFailed: null
+    setFailed: null,
+    noInterrupt: false
 };
 
 // component initialization function
