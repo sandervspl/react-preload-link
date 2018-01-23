@@ -355,14 +355,19 @@ var PreloadLink$1 = function (_React$Component) {
             // prevent navigation if we can't override a load with a new click
             if (process.busy && !process.canCancel) return;
 
-            // fire external loading method
-            _this.update(SET_LOADING);
+            if (!_this.props.load) {
+                // nothing to load -- we can navigate
+                _this.navigate();
+            } else {
+                // fire external loading method
+                _this.update(SET_LOADING);
 
-            if (!_this.state.loading) {
-                // set internal loading state and prepare to navigate
-                _this.setLoading(function () {
-                    return _this.prepareNavigation();
-                });
+                if (!_this.state.loading) {
+                    // set internal loading state and prepare to navigate
+                    _this.setLoading(function () {
+                        return _this.prepareNavigation();
+                    });
+                }
             }
         };
 
@@ -422,7 +427,7 @@ PreloadLink$1.propTypes = {
         // eslint-disable-next-line react/no-unused-prop-types
         push: PT.func
     }),
-    load: PT.oneOfType([PT.func, PT.arrayOf(PT.func)]).isRequired,
+    load: PT.oneOfType([PT.func, PT.arrayOf(PT.func)]),
     to: PT.string.isRequired,
     /* eslint-disable react/no-unused-prop-types */
     setLoading: PT.func,
