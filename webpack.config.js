@@ -22,22 +22,19 @@ module.exports = {
         rules: [
             {
                 test: /\.css$/,
-                use: ['style-loader', 'css-loader'],
+                use: ExtractTextPlugin.extract({
+                    fallback: 'style-loader',
+                    use: 'css-loader',
+                }),
             },
             {
                 test: /\.js$/,
                 exclude: [/node_modules/],
-                use: [{
-                    loader: 'babel-loader',
-                }],
+                use: 'babel-loader',
             },
             {
                 test: /\.html$/,
-                use: [
-                    {
-                        loader: 'html-loader',
-                    },
-                ],
+                use: 'html-loader',
             },
         ],
     },
@@ -57,6 +54,6 @@ module.exports = {
             inject: false,
             template: path.resolve(__dirname, 'examples/src/index.html'),
         }),
-        new ExtractTextPlugin('example.css'),
+        new ExtractTextPlugin('style.css'),
     ],
 };

@@ -56,7 +56,6 @@ button {
 }
 
 a {
-    all: unset;
     cursor: pointer;
     text-decoration: underline;
     color: cornflowerblue;
@@ -126,7 +125,7 @@ form h4 {
 .content {
     padding: 0 15px;
     width: 100%;
-    max-width: 1000px;
+    max-width: 600px;
     text-align: left;
 }
 

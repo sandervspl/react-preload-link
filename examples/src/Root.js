@@ -1,10 +1,9 @@
 /* eslint-disable */
 import React from 'react';
-import { Route, Switch, BrowserRouter, Link } from 'react-router-dom';
+import { Route, Switch, HashRouter, Link } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { PreloadLinkInit } from 'react-preload-link';
 import NProgress from 'nprogress';
-import 'nprogress/nprogress.css';
 
 import Store from './Store';
 import { setFailed, setLoading, setSuccess } from './ducks/app';
@@ -40,9 +39,7 @@ const App = () => (
                     className="github-button"
                     data-size="large"
                     href="https://github.com/sandervspl/react-preload-link"
-                    data-count-href="/sandervspl/react-preload-link/stargazers"
-                    data-count-api="/repos/sandervspl/react-preload-link#stargazers_count"
-                    data-count-aria-label="# stargazers on GitHub"
+                    data-show-count="true"
                     aria-label="Star sandervspl/react-preload-link on GitHub"
                 >
                     Star on Github
@@ -71,9 +68,9 @@ const App = () => (
 
 const Root = () => (
     <Provider store={Store}>
-        <BrowserRouter>
+        <HashRouter>
             <Route path="/" component={App} />
-        </BrowserRouter>
+        </HashRouter>
     </Provider>
 );
 

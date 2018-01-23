@@ -85,9 +85,12 @@ class Home extends React.Component {
 
     render() {
         const { countdown, personIdList, waitTime } = this.state;
-        const { app } = this.props;
+        const { app, location } = this.props;
         const fn = this.useFn();
         const loadList = this.loadPersonList();
+
+        let path = location.pathname === '/' ? '' : location.pathname;
+        path = path[path.length - 1] === '/' ? path.slice(path.length - 1) : path;
 
         return (
             <React.Fragment>
@@ -103,12 +106,12 @@ class Home extends React.Component {
                             setSucceed={this.setSucceed}
                         />
 
-                        <PreloadLink to="/page2" load={fn}>
+                        <PreloadLink to={`${path}/page2`} load={fn}>
                             <p>Link</p>
                         </PreloadLink>
 
                         <PreloadLink
-                            to="/page2"
+                            to={`${path}/page2`}
                             load={fn}
                             setLoading={this.customLoading}
                             setSuccess={this.customDone}
@@ -127,7 +130,7 @@ class Home extends React.Component {
 
                         <button disabled={personIdList.length === 0}>
                             <PreloadLink
-                                to={`/profile/${personIdList}`}
+                                to={`${path}/profile/${personIdList}`}
                                 load={loadList}
                             >
                                 To Star Wars person page
