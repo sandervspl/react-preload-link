@@ -9,7 +9,7 @@
     "authors": [
         "Sander Vispoel"
     ],
-    "description": "A link that preloads your data before navigating built with and for ReactJS",
+    "description": "A superversion of React Router's Link that preloads your data before navigating. Built with and for React.",
     "moduleType": [
         "amd",
         "globals",
