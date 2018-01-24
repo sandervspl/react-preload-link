@@ -38,7 +38,7 @@ describe('<PreloadLink to="/" />', () => {
 
     it('"to" is "/"', () => {
         instance = getPreloadLink();
-        expect(instance.props().to).toEqual('/');
+        expect(instance.prop('to')).toEqual('/');
     });
 });
 
@@ -47,7 +47,7 @@ describe('<PreloadLink to="/" noInterrupt />', () => {
     let instance;
 
     beforeEach(() => {
-        component = mount(<Router>
+        component = shallow(<Router>
             <PreloadLink to="/" noInterrupt />
         </Router>);
     });
@@ -56,7 +56,7 @@ describe('<PreloadLink to="/" noInterrupt />', () => {
 
     it('"noInterrupt" is true', () => {
         instance = getPreloadLink();
-        expect(instance.props().noInterrupt).toEqual(true);
+        expect(instance.prop('noInterrupt')).toEqual(true);
     });
 });
 
@@ -67,24 +67,24 @@ describe('PreloadLink with hook override props', () => {
     const getPreloadLink = () => component.find(PreloadLink);
 
     beforeEach(() => {
-        component = mount(<Router>
+        component = shallow(<Router>
             <PreloadLink to="/" noInterrupt />
         </Router>);
     });
 
     it('<PreloadLink onLoading={fn} /> has prop', () => {
         instance = getPreloadLink();
-        expect(instance.props().onLoading).not.toEqual(null);
+        expect(instance.prop('onLoading')).not.toEqual(null);
     });
 
     it('<PreloadLink onSuccess={fn} /> has prop', () => {
         instance = getPreloadLink();
-        expect(instance.props().onSuccess).not.toEqual(null);
+        expect(instance.prop('onSuccess')).not.toEqual(null);
     });
 
     it('<PreloadLink onFail={fn} /> has prop', () => {
         instance = getPreloadLink();
-        expect(instance.props().onFail).not.toEqual(null);
+        expect(instance.prop('onFail')).not.toEqual(null);
     });
 });
 
