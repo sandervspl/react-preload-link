@@ -80,7 +80,7 @@
         "lint": "eslint .",
         "deploy": "cross-env NODE_ENV=production nps publish",
         "start": "webpack-dev-server --progress",
-        "test": "clear && jest"
+        "test": "clear && jest ./test/*.test.js"
     },
     "files": [
         "dist",
