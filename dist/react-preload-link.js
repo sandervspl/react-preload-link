@@ -16,6 +16,14 @@ var uuid = function uuid() {
   return ++idCounter;
 };
 
+// eslint-disable-next-line
+var c = {
+    ON_LOADING: 'onLoading',
+    ON_SUCCESS: 'onSuccess',
+    ON_FAIL: 'onFail',
+    PRELOAD_FAIL: 'preloadLink/fail'
+};
+
 var asyncGenerator = function () {
   function AwaitValue(value) {
     this.value = value;
@@ -213,21 +221,15 @@ var possibleConstructorReturn = function (self, call) {
   return call && (typeof call === "object" || typeof call === "function") ? call : self;
 };
 
-// lifecycle constants
-var SET_LOADING = 'setLoading';
-var SET_SUCCESS = 'setSuccess';
-var SET_FAILED = 'setFailed';
-
 // let Preload Link know the fetch failed with this constant
-var PRELOAD_FAIL = 'preloadLink/fail';
-
+var PRELOAD_FAIL = c.PRELOAD_FAIL;
 var PreloadLink$1 = function (_React$Component) {
     inherits(PreloadLink, _React$Component);
 
-    function PreloadLink(props) {
+    function PreloadLink() {
         classCallCheck(this, PreloadLink);
 
-        var _this = possibleConstructorReturn(this, (PreloadLink.__proto__ || Object.getPrototypeOf(PreloadLink)).call(this, props));
+        var _this = possibleConstructorReturn(this, (PreloadLink.__proto__ || Object.getPrototypeOf(PreloadLink)).call(this));
 
         _this.setLoading = function () {
             var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : noop;
@@ -273,7 +275,7 @@ var PreloadLink$1 = function (_React$Component) {
         _this.update = function (state) {
             var method = PreloadLink[state];
 
-            // execution of lifecycle methods
+            // execution of lifecycle hooks
             var execute = function execute(fn) {
                 if (!fn) return;
 
@@ -284,9 +286,9 @@ var PreloadLink$1 = function (_React$Component) {
                 }
             };
 
-            // update state and call lifecycle method
+            // update state and call lifecycle hook
             if (_this.props[state]) {
-                // the override prop returns a function with the default lifecycle method as param.
+                // the override prop returns a function with the default lifecycle hooks as param.
                 _this.props[state](function () {
                     return execute(method);
                 });
@@ -335,17 +337,17 @@ var PreloadLink$1 = function (_React$Component) {
                 var preloadFailed = isArray ? result.includes(PRELOAD_FAIL) : result === PRELOAD_FAIL;
 
                 if (preloadFailed) {
-                    _this.update(SET_FAILED);
+                    _this.update(c.ON_FAIL);
                     _this.setLoaded();
                 } else {
-                    _this.update(SET_SUCCESS);
+                    _this.update(c.ON_SUCCESS);
                     _this.setLoaded(function () {
                         return _this.navigate();
                     });
                 }
             }).catch(function () {
                 // loading failed. Set in- and external states to reflect this
-                _this.update(SET_FAILED);
+                _this.update(c.ON_FAIL);
                 _this.setLoaded();
             });
         };
@@ -365,7 +367,7 @@ var PreloadLink$1 = function (_React$Component) {
                 _this.navigate();
             } else {
                 // fire external loading method
-                _this.update(SET_LOADING);
+                _this.update(c.ON_LOADING);
 
                 if (!_this.state.loading) {
                     // set internal loading state and prepare to navigate
@@ -384,10 +386,10 @@ var PreloadLink$1 = function (_React$Component) {
         return _this;
     }
 
-    // Initialize the lifecycle functions of page loading.
+    // Initialize the lifecycle hooks
 
 
-    // update fetch state and execute lifecycle methods
+    // update fetch state and execute lifecycle hooks
 
 
     // navigate with react-router to new URL
@@ -421,9 +423,9 @@ PreloadLink$1.process = {
 };
 
 PreloadLink$1.init = function (options) {
-    PreloadLink$1[SET_LOADING] = options.setLoading;
-    PreloadLink$1[SET_SUCCESS] = options.setSuccess;
-    PreloadLink$1[SET_FAILED] = options.setFailed;
+    PreloadLink$1[c.ON_LOADING] = options.onLoading;
+    PreloadLink$1[c.ON_SUCCESS] = options.onSuccess;
+    PreloadLink$1[c.ON_FAIL] = options.onFail;
 };
 
 PreloadLink$1.propTypes = {
@@ -435,28 +437,28 @@ PreloadLink$1.propTypes = {
     load: PT.oneOfType([PT.func, PT.arrayOf(PT.func)]),
     to: PT.string.isRequired,
     /* eslint-disable react/no-unused-prop-types */
-    setLoading: PT.func,
-    setSuccess: PT.func,
-    setFailed: PT.func,
+    onLoading: PT.func,
+    onSuccess: PT.func,
+    onFail: PT.func,
     /* eslint-enable */
     noInterrupt: PT.bool
 };
 
 PreloadLink$1.defaultProps = {
-    setLoading: null,
-    setSuccess: null,
-    setFailed: null,
+    onLoading: null,
+    onSuccess: null,
+    onFail: null,
     noInterrupt: false
 };
 
 // component initialization function
-var PreloadLinkInit = PreloadLink$1.init;
+var configure = PreloadLink$1.init;
 
 // component
 var PreloadLink$2 = reactRouterDom.withRouter(PreloadLink$1);
 
 PreloadLink$2.PRELOAD_FAIL = PRELOAD_FAIL;
-PreloadLink$2.PreloadLinkInit = PreloadLinkInit;
+PreloadLink$2.configure = configure;
 
 return PreloadLink$2;
 
