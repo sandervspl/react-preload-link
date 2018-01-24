@@ -2,15 +2,14 @@ import { createStore, applyMiddleware, combineReducers, compose } from 'redux';
 import thunk from 'redux-thunk';
 import * as reducers from './ducks';
 
-const middleware = applyMiddleware(thunk);
-
 /* eslint-disable no-underscore-dangle */
+const middleware = window.__REDUX_DEVTOOLS_EXTENSION__
+    ? compose(applyMiddleware(thunk), window.__REDUX_DEVTOOLS_EXTENSION__())
+    : applyMiddleware(thunk);
+
 const store = createStore(
     combineReducers({ ...reducers }),
-    compose(
-        middleware,
-        window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__(),
-    ),
+    middleware,
 );
 /* eslint-enable */
 
