@@ -1,6 +1,6 @@
-import { default as PreloadLink, preloadLinkConfig, PRELOAD_FAIL } from './PreloadLink';
+import { default as PreloadLink, configure, PRELOAD_FAIL } from './PreloadLink';
 
 PreloadLink.PRELOAD_FAIL = PRELOAD_FAIL;
-PreloadLink.preloadLinkConfig = preloadLinkConfig;
+PreloadLink.configure = configure;
 
 export default PreloadLink;

@@ -202,7 +202,7 @@ PreloadLink.defaultProps = {
 };
 
 // component initialization function
-export const preloadLinkConfig = PreloadLink.init;
+export const configure = PreloadLink.init;
 
 // component
 export default withRouter(PreloadLink);
