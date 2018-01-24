@@ -19,9 +19,9 @@ NProgress.configure({
 });
 
 preloadLink.configure({
-    onFail: () => Store.dispatch(setFailed()),
-    onLoad: () => Store.dispatch(setLoading()),
+    onLoading: () => Store.dispatch(setLoading()),
     onSuccess: () => Store.dispatch(setSuccess()),
+    onFail: () => Store.dispatch(setFailed()),
 });
 
 const App = () => (

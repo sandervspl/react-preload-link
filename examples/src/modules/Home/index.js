@@ -110,9 +110,9 @@ class Home extends React.Component {
                         <PreloadLink
                             to="page2"
                             load={fn}
-                            setLoading={this.customLoading}
-                            setSuccess={this.customDone}
-                            setFailed={this.customDone}
+                            onLoading={this.customLoading}
+                            onSuccess={this.customDone}
+                            onFail={this.customDone}
                         >
                             <p>Advanced link</p>
                         </PreloadLink>
@@ -120,9 +120,9 @@ class Home extends React.Component {
                         <PreloadLink
                             to="page2"
                             load={fn}
-                            setLoading={this.customLoading}
-                            setSuccess={this.customDone}
-                            setFailed={this.customDone}
+                            onLoading={this.customLoading}
+                            onSuccess={this.customDone}
+                            onFail={this.customDone}
                             noInterrupt
                         >
                             <p>Uninteruptable link</p>

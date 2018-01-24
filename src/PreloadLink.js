@@ -8,7 +8,7 @@ import c from './constants';
 export const { PRELOAD_FAIL } = c;
 
 class PreloadLink extends React.Component {
-    static [c.ON_LOAD];
+    static [c.ON_LOADING];
     static [c.ON_SUCCESS];
     static [c.ON_FAIL];
     static process = {
@@ -20,7 +20,7 @@ class PreloadLink extends React.Component {
 
     // Initialize the lifecycle hooks
     static init = (options) => {
-        PreloadLink[c.ON_LOAD] = options.onLoad;
+        PreloadLink[c.ON_LOADING] = options.onLoading;
         PreloadLink[c.ON_SUCCESS] = options.onSuccess;
         PreloadLink[c.ON_FAIL] = options.onFail;
     }
@@ -159,7 +159,7 @@ class PreloadLink extends React.Component {
             this.navigate();
         } else {
             // fire external loading method
-            this.update(c.ON_LOAD);
+            this.update(c.ON_LOADING);
 
             if (!this.state.loading) {
                 // set internal loading state and prepare to navigate
@@ -187,17 +187,17 @@ PreloadLink.propTypes = {
     load: PT.oneOfType([PT.func, PT.arrayOf(PT.func)]),
     to: PT.string.isRequired,
     /* eslint-disable react/no-unused-prop-types */
-    setLoading: PT.func,
-    setSuccess: PT.func,
-    setFailed: PT.func,
+    onLoading: PT.func,
+    onSuccess: PT.func,
+    onFail: PT.func,
     /* eslint-enable */
     noInterrupt: PT.bool,
 };
 
 PreloadLink.defaultProps = {
-    setLoading: null,
-    setSuccess: null,
-    setFailed: null,
+    onLoading: null,
+    onSuccess: null,
+    onFail: null,
     noInterrupt: false,
 };
 
