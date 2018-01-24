@@ -1,5 +1,4 @@
 import { PRELOAD_FAIL } from 'react-preload-link';
-import * as app from './app';
 
 // action constants
 export const LOADING = 'swapi/LOADING';

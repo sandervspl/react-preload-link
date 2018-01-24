@@ -1,6 +1,7 @@
+// eslint-disable-next-line
 export default {
-    SET_LOADING: 'setLoading',
-    SET_SUCCESS: 'setSuccess',
-    SET_FAILED: 'setFailed',
+    ON_LOAD: 'setLoading',
+    ON_SUCCESS: 'setSuccess',
+    ON_FAIL: 'setFailed',
     PRELOAD_FAIL: 'preloadLink/fail',
 };

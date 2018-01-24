@@ -2,19 +2,15 @@ import React from 'react';
 import PT from 'prop-types';
 import { withRouter, Link } from 'react-router-dom';
 import { uuid, noop } from './helpers';
-
-// lifecycle constants
-const SET_LOADING = 'setLoading';
-const SET_SUCCESS = 'setSuccess';
-const SET_FAILED = 'setFailed';
+import c from './constants';
 
 // let Preload Link know the fetch failed with this constant
-export const PRELOAD_FAIL = 'preloadLink/fail';
+export const { PRELOAD_FAIL } = c;
 
 class PreloadLink extends React.Component {
-    static [SET_LOADING];
-    static [SET_SUCCESS];
-    static [SET_FAILED];
+    static [c.ON_LOAD];
+    static [c.ON_SUCCESS];
+    static [c.ON_FAIL];
     static process = {
         uid: 0,
         busy: false,
@@ -22,15 +18,15 @@ class PreloadLink extends React.Component {
         canCancel: true,
     };
 
-    // Initialize the lifecycle functions of page loading.
+    // Initialize the lifecycle hooks
     static init = (options) => {
-        PreloadLink[SET_LOADING] = options.setLoading;
-        PreloadLink[SET_SUCCESS] = options.setSuccess;
-        PreloadLink[SET_FAILED] = options.setFailed;
+        PreloadLink[c.ON_LOAD] = options.onLoad;
+        PreloadLink[c.ON_SUCCESS] = options.onSuccess;
+        PreloadLink[c.ON_FAIL] = options.onFail;
     }
 
-    constructor(props) {
-        super(props);
+    constructor() {
+        super();
 
         this.state = {
             loading: false,
@@ -74,11 +70,11 @@ class PreloadLink extends React.Component {
         this.setState({ loading: false }, () => callback());
     }
 
-    // update fetch state and execute lifecycle methods
+    // update fetch state and execute lifecycle hooks
     update = (state) => {
         const method = PreloadLink[state];
 
-        // execution of lifecycle methods
+        // execution of lifecycle hooks
         const execute = (fn) => {
             if (!fn) return;
 
@@ -89,9 +85,9 @@ class PreloadLink extends React.Component {
             }
         };
 
-        // update state and call lifecycle method
+        // update state and call lifecycle hook
         if (this.props[state]) {
-            // the override prop returns a function with the default lifecycle method as param.
+            // the override prop returns a function with the default lifecycle hooks as param.
             this.props[state](() => execute(method));
             this.setLoading();
         } else {
@@ -135,16 +131,16 @@ class PreloadLink extends React.Component {
                     : result === PRELOAD_FAIL;
 
                 if (preloadFailed) {
-                    this.update(SET_FAILED);
+                    this.update(c.ON_FAIL);
                     this.setLoaded();
                 } else {
-                    this.update(SET_SUCCESS);
+                    this.update(c.ON_SUCCESS);
                     this.setLoaded(() => this.navigate());
                 }
             })
             .catch(() => {
                 // loading failed. Set in- and external states to reflect this
-                this.update(SET_FAILED);
+                this.update(c.ON_FAIL);
                 this.setLoaded();
             });
     }
@@ -163,7 +159,7 @@ class PreloadLink extends React.Component {
             this.navigate();
         } else {
             // fire external loading method
-            this.update(SET_LOADING);
+            this.update(c.ON_LOAD);
 
             if (!this.state.loading) {
                 // set internal loading state and prepare to navigate
@@ -206,7 +202,7 @@ PreloadLink.defaultProps = {
 };
 
 // component initialization function
-export const PreloadLinkInit = PreloadLink.init;
+export const preloadLinkConfig = PreloadLink.init;
 
 // component
 export default withRouter(PreloadLink);

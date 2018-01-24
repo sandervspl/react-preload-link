@@ -2,7 +2,7 @@
 import React from 'react';
 import { Route, Switch, HashRouter, Link } from 'react-router-dom';
 import { Provider } from 'react-redux';
-import { PreloadLinkInit } from 'react-preload-link';
+import { preloadLinkConfig } from 'react-preload-link';
 import NProgress from 'nprogress';
 
 import Store from './Store';
@@ -18,10 +18,10 @@ NProgress.configure({
     minimum: .25,
 });
 
-PreloadLinkInit({
-    setFailed: () => Store.dispatch(setFailed()),
-    setLoading: () => Store.dispatch(setLoading()),
-    setSuccess: () => Store.dispatch(setSuccess()),
+preloadLinkConfig({
+    onFail: () => Store.dispatch(setFailed()),
+    onLoad: () => Store.dispatch(setLoading()),
+    onSuccess: () => Store.dispatch(setSuccess()),
 });
 
 const App = () => (
