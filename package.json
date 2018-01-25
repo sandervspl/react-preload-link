@@ -1,10 +1,10 @@
 {
     "name": "react-preload-link",
-    "version": "0.0.10",
+    "version": "0.1.0",
     "description": "A superversion of React Router's Link that preloads your data before navigating. Built with and for React.",
     "main": "lib/index.js",
-    "jsnext:main": "dist/react-preload-link.es.js",
-    "module": "dist/react-preload-link.es.js",
+    "jsnext:main": "dist/react-preload-link.js",
+    "module": "dist/react-preload-link.js",
     "types": "./index.d.ts",
     "author": "Sander Vispoel",
     "license": "MIT",
