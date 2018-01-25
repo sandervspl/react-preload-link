@@ -9,7 +9,7 @@ const path = 'dist/react-preload-link';
 const globals = {
     react: 'React',
     'prop-types': 'PropTypes',
-    'react-router-dom': 'reactRouterDOM',
+    'react-router-dom': 'ReactRouterDOM',
 };
 const external = Object.keys(globals);
 const babelOptions = (production) => {
@@ -28,7 +28,7 @@ export default [
     {
         input: 'src/index.js',
         output: {
-            file: path + '.es.js',
+            file: path + '.js',
             format: 'es',
         },
         external: external,

@@ -12,7 +12,6 @@ module.exports = {
             default: series(
                 rimraf('dist'),
                 rimraf('lib'),
-                // concurrent.nps('build.css', 'build.cssmin'),
                 concurrent.nps('build.rollup', 'build.babel'),
             ),
             rollup: 'rollup --config',

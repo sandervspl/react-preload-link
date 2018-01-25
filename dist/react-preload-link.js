@@ -1,7 +1,7 @@
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('react'), require('prop-types'), require('react-router-dom')) :
 	typeof define === 'function' && define.amd ? define(['react', 'prop-types', 'react-router-dom'], factory) :
-	(global.PreloadLink = factory(global.React,global.PropTypes,global.reactRouterDOM));
+	(global.PreloadLink = factory(global.React,global.PropTypes,global.ReactRouterDOM));
 }(this, (function (React,PT,reactRouterDom) { 'use strict';
 
 React = React && React.hasOwnProperty('default') ? React['default'] : React;
