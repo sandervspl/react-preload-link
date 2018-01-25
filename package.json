@@ -1,6 +1,6 @@
 {
     "name": "react-preload-link",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "description": "A superversion of React Router's Link that preloads your data before navigating. Built with and for React.",
     "main": "lib/index.js",
     "jsnext:main": "dist/react-preload-link.es.js",
@@ -66,6 +66,7 @@
         "rollup-plugin-node-resolve": "^3.0.0",
         "rollup-plugin-uglify": "^2.0.1",
         "style-loader": "^0.18.2",
+        "typescript": "^2.6.2",
         "uglify-es": "^3.0.28",
         "webpack": "^3.5.5",
         "webpack-dev-server": "^2.7.1"
@@ -87,7 +88,8 @@
     },
     "files": [
         "dist",
-        "lib"
+        "lib",
+        "index.d.ts"
     ],
     "keywords": [
         "react",
