@@ -1,7 +1,5 @@
 // eslint-disable-next-line
-export default {
-    ON_LOADING: 'onLoading',
-    ON_SUCCESS: 'onSuccess',
-    ON_FAIL: 'onFail',
-    PRELOAD_FAIL: 'preloadLink/fail',
-};
+export const ON_LOADING = 'onLoading';
+export const ON_SUCCESS = 'onSuccess';
+export const ON_FAIL = 'onFail';
+export const PRELOAD_FAIL = 'preloadLink/fail';

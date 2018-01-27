@@ -2,7 +2,7 @@ import React from 'react';
 import PT from 'prop-types';
 import { withRouter, Link } from 'react-router-dom';
 import { uuid, noop } from './helpers';
-import c from './constants';
+import * as c from './constants';
 
 // let Preload Link know the fetch failed with this constant
 export const { PRELOAD_FAIL } = c;

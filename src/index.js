@@ -1,4 +1,5 @@
-import { default as PreloadLink, configure, PRELOAD_FAIL } from './PreloadLink';
+import { default as PreloadLink, configure } from './PreloadLink';
+import { PRELOAD_FAIL } from './constants';
 
 export default PreloadLink;
 export {
