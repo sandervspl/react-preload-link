@@ -25,27 +25,7 @@ describe('<PreloadLink>', () => {
 
     const getPreloadLink = () => component.find(PreloadLink);
 
-    describe('[to="/"]', () => {
-        beforeEach(() => {
-            component = mount(
-                <Router>
-                    <PreloadLink to="/" />
-                </Router>
-            );
-
-            instance = getPreloadLink();
-        });
-
-        it('Renders a <PreloadLink> component', () => {
-            expect(instance.length).toEqual(1);
-        });
-
-        it('"to" is "/"', () => {
-            expect(instance.prop('to')).toEqual('/');
-        });
-    });
-
-    const url = '/page2';
+    const url = 'page2';
     describe(`[to="${url}"]`, () => {
         beforeEach(() => {
             component = mount(
@@ -57,9 +37,17 @@ describe('<PreloadLink>', () => {
             instance = getPreloadLink();
         });
 
-        it(`Changes route to "${url}" after click`, () => {
+        it('Renders a <PreloadLink> component', () => {
+            expect(instance.length).toEqual(1);
+        });
+
+        it(`"to" is "${url}"`, () => {
+            expect(instance.prop('to')).toEqual(url);
+        });
+
+        it(`Changes route to "${url}" after a click`, () => {
             instance.simulate('click');
-            expect(component.instance().history.location.pathname).toEqual(url);
+            expect(component.instance().history.location.pathname).toEqual(`/${url}`);
         });
     });
 });
