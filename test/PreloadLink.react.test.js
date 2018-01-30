@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-import React from 'react';
+import React, { Fragment } from 'react';
 import ReactDOM from 'react-dom';
 import { MemoryRouter as Router } from 'react-router-dom';
 // import * as renderer from 'react-test-renderer';
@@ -23,14 +23,15 @@ describe('<PreloadLink>', () => {
     let component;
     let instance;
 
+    const timeoutFn = () => new Promise((resolve) => setTimeout(() => resolve(), 1000));
     const getPreloadLink = () => component.find(PreloadLink);
+    const getPathname = () => component.instance().history.location.pathname;
 
-    const url = 'page2';
-    describe(`[to="${url}"]`, () => {
+    describe('[to="page2"]', () => {
         beforeEach(() => {
             component = mount(
                 <Router>
-                    <PreloadLink to={url} />
+                    <PreloadLink to="page2" />
                 </Router>
             );
 
@@ -41,13 +42,39 @@ describe('<PreloadLink>', () => {
             expect(instance.length).toEqual(1);
         });
 
-        it(`"to" is "${url}"`, () => {
-            expect(instance.prop('to')).toEqual(url);
+        it('Prop "to" is "page2"', () => {
+            expect(instance.prop('to')).toEqual('page2');
         });
 
-        it(`Changes route to "${url}" after a click`, () => {
+        it('Changes route to "page2" after a click', () => {
             instance.simulate('click');
-            expect(component.instance().history.location.pathname).toEqual(`/${url}`);
+            expect(getPathname()).toEqual('/page2');
+        });
+    });
+
+    describe('[noInterrupt=true]', () => {
+        beforeEach(() => {
+            component = mount(
+                <Router>
+                    <Fragment>
+                        <PreloadLink to="/" noInterrupt load={timeoutFn} />
+                        <PreloadLink to="/page2" />
+                    </Fragment>
+                </Router>
+            );
+
+            instance = getPreloadLink();
+        });
+
+        it('Prop "noInterrupt" is "true"', () => {
+            expect(instance.at(0).prop('noInterrupt')).toEqual(true);
+        });
+
+        it('Clicking a link does not interrupt a noInterrupt link', () => {
+            instance.at(0).simulate('click');
+            instance.at(1).simulate('click');
+
+            expect(getPathname()).not.toEqual('/page2');
         });
     });
 });
