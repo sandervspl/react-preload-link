@@ -12,6 +12,9 @@ import Root from '../examples/src/Root';
 // configure enzyme
 configure({ adapter: new Adapter() });
 
+// configure jest
+jest.useFakeTimers();
+
 describe('App', () => {
     it('Renders without crashing', () => {
         const div = document.createElement('div');
@@ -23,7 +26,7 @@ describe('<PreloadLink>', () => {
     let component;
     let instance;
 
-    const timeoutFn = () => new Promise((resolve) => setTimeout(() => resolve(), 1000));
+    const timeoutFn = () => new Promise((resolve) => setTimeout(() => resolve(), 100));
     const getPreloadLink = () => component.find(PreloadLink);
     const getPathname = () => component.instance().history.location.pathname;
 
@@ -75,6 +78,26 @@ describe('<PreloadLink>', () => {
             instance.at(1).simulate('click');
 
             expect(getPathname()).not.toEqual('/page2');
+        });
+    });
+
+    describe('Link with load function', () => {
+        beforeEach(() => {
+            component = mount(
+                <Router>
+                    <PreloadLink to="/page2" load={timeoutFn} />
+                </Router>
+            );
+
+            instance = getPreloadLink();
+        });
+
+        it('Navigate to "/page2" after 100ms', (done) => {
+            instance.simulate('click');
+
+            console.log(getPathname());
+            expect(getPathname()).toEqual('/page2');
+            done();
         });
     });
 });
