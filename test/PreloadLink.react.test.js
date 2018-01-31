@@ -2,9 +2,9 @@
 import React, { Fragment } from 'react';
 import ReactDOM from 'react-dom';
 import { MemoryRouter as Router } from 'react-router-dom';
-// import * as renderer from 'react-test-renderer';
 import { shallow, mount, configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
+import sinon from 'sinon';
 
 import PreloadLink, * as pll from 'react-preload-link';
 import Root from '../examples/src/Root';
@@ -23,81 +23,96 @@ describe('App', () => {
 });
 
 describe('<PreloadLink>', () => {
-    let component;
-    let instance;
+    let wrapper;
+    let link;
 
-    const timeoutFn = () => new Promise((resolve) => setTimeout(() => resolve(), 100));
-    const getPreloadLink = () => component.find(PreloadLink);
-    const getPathname = () => component.instance().history.location.pathname;
+    const timeoutFn = () => new Promise((resolve) => setTimeout(() => {
+        console.log('timeoutFn resolve');
+        resolve();
+    }, 100));
+    const getPreloadLink = () => wrapper.find(PreloadLink);
+    const getPathname = () => wrapper.instance().history.location.pathname;
 
     describe('[to="page2"]', () => {
         beforeEach(() => {
-            component = mount(
+            wrapper = mount(
                 <Router>
                     <PreloadLink to="page2" />
                 </Router>
             );
 
-            instance = getPreloadLink();
+            link = getPreloadLink();
         });
 
         it('Renders a <PreloadLink> component', () => {
-            expect(instance.length).toEqual(1);
+            expect(link.length).toEqual(1);
         });
 
         it('Prop "to" is "page2"', () => {
-            expect(instance.prop('to')).toEqual('page2');
+            expect(link.prop('to')).toEqual('page2');
         });
 
         it('Changes route to "page2" after a click', () => {
-            instance.simulate('click');
+            link.simulate('click');
             expect(getPathname()).toEqual('/page2');
         });
     });
 
     describe('[noInterrupt=true]', () => {
+        let clock;
+
         beforeEach(() => {
-            component = mount(
+            clock = sinon.useFakeTimers();
+
+            wrapper = mount(
                 <Router>
                     <Fragment>
-                        <PreloadLink to="/" noInterrupt load={timeoutFn} />
-                        <PreloadLink to="/page2" />
+                        <PreloadLink to="page1" noInterrupt load={timeoutFn} />
+                        <PreloadLink to="page2" />
                     </Fragment>
                 </Router>
             );
 
-            instance = getPreloadLink();
+            link = getPreloadLink();
+        });
+
+        afterEach(() => {
+            clock.restore();
         });
 
         it('Prop "noInterrupt" is "true"', () => {
-            expect(instance.at(0).prop('noInterrupt')).toEqual(true);
-        });
-
-        it('Clicking a link does not interrupt a noInterrupt link', () => {
-            instance.at(0).simulate('click');
-            instance.at(1).simulate('click');
-
-            expect(getPathname()).not.toEqual('/page2');
-        });
-    });
-
-    describe('Link with load function', () => {
-        beforeEach(() => {
-            component = mount(
-                <Router>
-                    <PreloadLink to="/page2" load={timeoutFn} />
-                </Router>
-            );
-
-            instance = getPreloadLink();
+            expect(link.at(0).prop('noInterrupt')).toEqual(true);
         });
 
         it('Navigate to "/page2" after 100ms', (done) => {
-            instance.simulate('click');
+            expect.assertions(1);
 
-            console.log(getPathname());
-            expect(getPathname()).toEqual('/page2');
-            done();
+            pll.configure({
+                onNavigate: () => {
+                    expect(getPathname()).toEqual('/page2');
+                    done();
+                },
+            });
+
+            link.at(1).simulate('click');
+
+            clock.tick(100);
+        });
+
+        it('Clicking a link does not interrupt a noInterrupt link', (done) => {
+            expect.assertions(1);
+
+            pll.configure({
+                onNavigate: () => {
+                    expect(getPathname()).toEqual('/page1');
+                    done();
+                },
+            });
+
+            link.at(0).simulate('click');
+            link.at(1).simulate('click');
+
+            clock.tick(100);
         });
     });
 });
