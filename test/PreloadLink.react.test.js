@@ -2,7 +2,7 @@
 import React, { Fragment } from 'react';
 import ReactDOM from 'react-dom';
 import { MemoryRouter as Router } from 'react-router-dom';
-import { shallow, mount, configure } from 'enzyme';
+import { mount, configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import sinon from 'sinon';
 
@@ -29,17 +29,31 @@ describe('<PreloadLink>', () => {
     let wrapper;
     let link;
     let clock;
+    let resolves;
 
-    const timeoutFn = () => new Promise((resolve) => setTimeout(() => resolve(), LOAD_DELAY));
-    const getPreloadLink = () => wrapper.find(PreloadLink);
-    const getPathname = () => wrapper.instance().history.location.pathname;
+    const PreloadLinkObj = PreloadLink.WrappedComponent;
+    const fakeFn = sinon.spy();
+
+    const timeoutFn = () => new Promise((resolve) => setTimeout(() => {
+        resolves.push(true);
+        resolve();
+    }, LOAD_DELAY));
+
+    const getPreloadLink = () => (
+        wrapper.find(PreloadLink)
+    );
+
+    const getPathname = () => (
+        wrapper.instance().history.location.pathname
+    );
 
     beforeEach(() => {
+        pll.configure({});
+        resolves = [];
         clock = sinon.useFakeTimers();
     });
 
     afterEach(() => {
-        pll.configure({});
         clock.restore();
     });
 
@@ -92,6 +106,8 @@ describe('<PreloadLink>', () => {
                         <PreloadLink to="page1" />
                         <PreloadLink to="page2" load={timeoutFn} />
                         <PreloadLink to="page3" noInterrupt load={timeoutFn} />
+                        <PreloadLink to="page4" load={fakeFn} />
+                        <PreloadLink to="page5" load={[timeoutFn, timeoutFn]} />
                     </Fragment>
                 </Router>
             );
@@ -119,7 +135,7 @@ describe('<PreloadLink>', () => {
             clock.tick(LOAD_DELAY);
         });
 
-        it('Clicking a link does not interrupt a noInterrupt link', (done) => {
+        it('Clicking a link does not interrupt a uninterruptable link and routes to correct route', (done) => {
             expect.assertions(1);
 
             pll.configure({
@@ -135,6 +151,31 @@ describe('<PreloadLink>', () => {
             clock.tick(LOAD_DELAY);
         });
 
-        it('Wait for all load functions before navigating');
+        it('Subsequent click(s) when a link is uninterruptable will not trigger new load function(s)', () => {
+            link.at(2).simulate('click');
+            link.at(3).simulate('click');
+
+            expect(PreloadLinkObj.process.busy).toBe(true);
+            expect(PreloadLinkObj.process.canCancel).toBe(false);
+            expect(fakeFn.notCalled).toBe(true);
+
+            clock.tick(LOAD_DELAY);
+        });
+
+        it('Wait for all load functions before navigating', (done) => {
+            expect.assertions(2);
+
+            pll.configure({
+                onNavigate: () => {
+                    expect(resolves.length).toEqual(2);
+                    expect(getPathname()).toEqual('/page5');
+                    done();
+                },
+            });
+
+            link.at(4).simulate('click');
+
+            clock.tick(LOAD_DELAY);
+        });
     });
 });
