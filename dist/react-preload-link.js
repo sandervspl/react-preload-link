@@ -312,6 +312,16 @@ var PreloadLink$1 = function (_React$Component) {
             }
         };
 
+        _this.handleFailed = function () {
+            _this.update(ON_FAIL);
+            _this.setLoaded();
+        };
+
+        _this.returnsPromise = function (fn) {
+            var obj = fn();
+            return Promise.resolve(obj) === obj;
+        };
+
         _this.prepareNavigation = function () {
             var process = PreloadLink.process;
             var load = _this.props.load;
@@ -321,11 +331,25 @@ var PreloadLink$1 = function (_React$Component) {
 
             // create functions of our load props
             if (isArray) {
-                var loadList = load.map(function (fn) {
-                    return fn();
-                });
+                var loadList = [];
+                for (var i = 0; i < load.length; i += 1) {
+                    var fn = load[i];
+
+                    if (!_this.returnsPromise(fn)) {
+                        console.error('Error: Not all given functions are returning a Promise. Aborting navigation. ');
+                        return _this.handleFailed();
+                    }
+
+                    loadList.push(fn);
+                }
+
                 toLoad = Promise.all(loadList);
             } else {
+                if (!_this.returnsPromise(load)) {
+                    console.error('Error: Given load function does not return a Promise. Aborting navigation. ');
+                    return _this.handleFailed();
+                }
+
                 toLoad = load();
             }
 
@@ -340,8 +364,7 @@ var PreloadLink$1 = function (_React$Component) {
                 var preloadFailed = isArray ? result.includes(PRELOAD_FAIL) : result === PRELOAD_FAIL;
 
                 if (preloadFailed) {
-                    _this.update(ON_FAIL);
-                    _this.setLoaded();
+                    _this.handleFailed();
                 } else {
                     _this.update(ON_SUCCESS);
                     _this.setLoaded(function () {
@@ -350,8 +373,7 @@ var PreloadLink$1 = function (_React$Component) {
                 }
             }).catch(function () {
                 // loading failed. Set in- and external states to reflect this
-                _this.update(ON_FAIL);
-                _this.setLoaded();
+                _this.handleFailed();
             });
         };
 

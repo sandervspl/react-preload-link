@@ -177,5 +177,10 @@ describe('<PreloadLink>', () => {
 
             clock.tick(LOAD_DELAY);
         });
+
+        it('Fail when load prop is not a function that returns a Promise', () => {
+            link.at(3).simulate('click');
+            expect(getPathname()).not.toEqual('/page4');
+        });
     });
 });

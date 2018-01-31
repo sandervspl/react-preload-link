@@ -32,6 +32,7 @@ module.exports = {
 // View link below for react rules documentation
 // https://github.com/yannickcr/eslint-plugin-react#list-of-supported-rules
     rules: {
+        'consistent-return': 'off',
         'indent': ['error', 4],
         'arrow-parens': 'off',
         // Specify whether double or single quotes should be used in JSX attributes

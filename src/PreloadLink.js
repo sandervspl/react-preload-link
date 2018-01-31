@@ -108,6 +108,16 @@ class PreloadLink extends React.Component {
         }
     }
 
+    handleFailed = () => {
+        this.update(c.ON_FAIL);
+        this.setLoaded();
+    }
+
+    returnsPromise = (fn) => {
+        const obj = fn();
+        return Promise.resolve(obj) === obj;
+    }
+
     // prepares the page transition. Wait on all promises to resolve before changing route.
     prepareNavigation = () => {
         const { process } = PreloadLink;
@@ -117,9 +127,25 @@ class PreloadLink extends React.Component {
 
         // create functions of our load props
         if (isArray) {
-            const loadList = load.map(fn => fn());
+            const loadList = [];
+            for (let i = 0; i < load.length; i += 1) {
+                const fn = load[i];
+
+                if (!this.returnsPromise(fn)) {
+                    console.error('Error: Not all given functions are returning a Promise. Aborting navigation. ');
+                    return this.handleFailed();
+                }
+
+                loadList.push(fn);
+            }
+
             toLoad = Promise.all(loadList);
         } else {
+            if (!this.returnsPromise(load)) {
+                console.error('Error: Given load function does not return a Promise. Aborting navigation. ');
+                return this.handleFailed();
+            }
+
             toLoad = load();
         }
 
@@ -137,8 +163,7 @@ class PreloadLink extends React.Component {
                     : result === PRELOAD_FAIL;
 
                 if (preloadFailed) {
-                    this.update(c.ON_FAIL);
-                    this.setLoaded();
+                    this.handleFailed();
                 } else {
                     this.update(c.ON_SUCCESS);
                     this.setLoaded(() => this.navigate());
@@ -146,8 +171,7 @@ class PreloadLink extends React.Component {
             })
             .catch(() => {
                 // loading failed. Set in- and external states to reflect this
-                this.update(c.ON_FAIL);
-                this.setLoaded();
+                this.handleFailed();
             });
     }
 
