@@ -15,6 +15,9 @@ configure({ adapter: new Adapter() });
 // configure jest
 jest.useFakeTimers();
 
+// constants
+const LOAD_DELAY = 100;
+
 describe('App', () => {
     it('Renders without crashing', () => {
         const div = document.createElement('div');
@@ -25,50 +28,29 @@ describe('App', () => {
 describe('<PreloadLink>', () => {
     let wrapper;
     let link;
+    let clock;
 
-    const timeoutFn = () => new Promise((resolve) => setTimeout(() => {
-        console.log('timeoutFn resolve');
-        resolve();
-    }, 100));
+    const timeoutFn = () => new Promise((resolve) => setTimeout(() => resolve(), LOAD_DELAY));
     const getPreloadLink = () => wrapper.find(PreloadLink);
     const getPathname = () => wrapper.instance().history.location.pathname;
 
-    describe('[to="page2"]', () => {
-        beforeEach(() => {
-            wrapper = mount(
-                <Router>
-                    <PreloadLink to="page2" />
-                </Router>
-            );
-
-            link = getPreloadLink();
-        });
-
-        it('Renders a <PreloadLink> component', () => {
-            expect(link.length).toEqual(1);
-        });
-
-        it('Prop "to" is "page2"', () => {
-            expect(link.prop('to')).toEqual('page2');
-        });
-
-        it('Changes route to "page2" after a click', () => {
-            link.simulate('click');
-            expect(getPathname()).toEqual('/page2');
-        });
+    beforeEach(() => {
+        clock = sinon.useFakeTimers();
     });
 
-    describe('[noInterrupt=true]', () => {
-        let clock;
+    afterEach(() => {
+        pll.configure({});
+        clock.restore();
+    });
 
+    describe('Props', () => {
         beforeEach(() => {
-            clock = sinon.useFakeTimers();
-
             wrapper = mount(
                 <Router>
                     <Fragment>
-                        <PreloadLink to="page1" noInterrupt load={timeoutFn} />
-                        <PreloadLink to="page2" />
+                        <PreloadLink to="page1" />
+                        <PreloadLink to="page2" noInterrupt />
+                        <PreloadLink to="page3" load={timeoutFn} />
                     </Fragment>
                 </Router>
             );
@@ -76,15 +58,53 @@ describe('<PreloadLink>', () => {
             link = getPreloadLink();
         });
 
-        afterEach(() => {
-            clock.restore();
+        it('Renders a <PreloadLink> component', () => {
+            expect(link.at(0).length).toEqual(1);
         });
 
-        it('Prop "noInterrupt" is "true"', () => {
-            expect(link.at(0).prop('noInterrupt')).toEqual(true);
+        it('Prop "noInterrupt" default is "false"', () => {
+            expect(PreloadLink.WrappedComponent.defaultProps.noInterrupt).toEqual(false);
+        });
+    });
+
+    describe('Configuration', () => {
+        it('Does not crash without configuration', (done) => {
+            expect.assertions(1);
+
+            pll.configure({
+                onNavigate: () => {
+                    expect(getPathname()).toEqual('/page3');
+                    done();
+                },
+            });
+
+            link.at(2).simulate('click');
+
+            clock.tick(LOAD_DELAY);
+        });
+    });
+
+    describe('Navigating', () => {
+        beforeEach(() => {
+            wrapper = mount(
+                <Router>
+                    <Fragment>
+                        <PreloadLink to="page1" />
+                        <PreloadLink to="page2" load={timeoutFn} />
+                        <PreloadLink to="page3" noInterrupt load={timeoutFn} />
+                    </Fragment>
+                </Router>
+            );
+
+            link = getPreloadLink();
         });
 
-        it('Navigate to "/page2" after 100ms', (done) => {
+        it('Directly navigate to "page1" after a click without load function', () => {
+            link.at(0).simulate('click');
+            expect(getPathname()).toEqual('/page1');
+        });
+
+        it(`Navigate to "/page2" after ${LOAD_DELAY}ms`, (done) => {
             expect.assertions(1);
 
             pll.configure({
@@ -96,7 +116,7 @@ describe('<PreloadLink>', () => {
 
             link.at(1).simulate('click');
 
-            clock.tick(100);
+            clock.tick(LOAD_DELAY);
         });
 
         it('Clicking a link does not interrupt a noInterrupt link', (done) => {
@@ -104,98 +124,17 @@ describe('<PreloadLink>', () => {
 
             pll.configure({
                 onNavigate: () => {
-                    expect(getPathname()).toEqual('/page1');
+                    expect(getPathname()).toEqual('/page3');
                     done();
                 },
             });
 
-            link.at(0).simulate('click');
-            link.at(1).simulate('click');
+            link.at(2).simulate('click'); // with noInterrupt
+            link.at(0).simulate('click'); // without
 
-            clock.tick(100);
+            clock.tick(LOAD_DELAY);
         });
+
+        it('Wait for all load functions before navigating');
     });
 });
-
-// describe('<PreloadLink to="/" noInterrupt />', () => {
-//     let component;
-//     let instance;
-//
-//     beforeEach(() => {
-//         component = shallow(<Router>
-//             <PreloadLink to="/" noInterrupt />
-//         </Router>);
-//     });
-//
-//     const getPreloadLink = () => component.find(PreloadLink);
-//
-//     it('"noInterrupt" is true', () => {
-//         instance = getPreloadLink();
-//         expect(instance.prop('noInterrupt')).toEqual(true);
-//     });
-// });
-//
-// describe('PreloadLink with hook override props', () => {
-//     let component;
-//     let instance;
-//
-//     const getPreloadLink = () => component.find(PreloadLink);
-//
-//     beforeEach(() => {
-//         component = shallow(<Router>
-//             <PreloadLink to="/" noInterrupt />
-//         </Router>);
-//     });
-//
-//     it('<PreloadLink onLoading={fn} /> has prop', () => {
-//         instance = getPreloadLink();
-//         expect(instance.prop('onLoading')).not.toEqual(null);
-//     });
-//
-//     it('<PreloadLink onSuccess={fn} /> has prop', () => {
-//         instance = getPreloadLink();
-//         expect(instance.prop('onSuccess')).not.toEqual(null);
-//     });
-//
-//     it('<PreloadLink onFail={fn} /> has prop', () => {
-//         instance = getPreloadLink();
-//         expect(instance.prop('onFail')).not.toEqual(null);
-//     });
-// });
-//
-// describe('Configuration', () => {
-//     const Class = PreloadLink.WrappedComponent;
-//
-//     it('Has a function for "onLoading"', () => {
-//         pll.configure({
-//             onLoading: () => {},
-//         });
-//
-//         expect(Class.onLoading).not.toEqual(undefined);
-//         expect(Class.onSuccess).toEqual(undefined);
-//         expect(Class.onFail).toEqual(undefined);
-//     });
-//
-//     it('Has a function for "onLoading", "onSuccess"', () => {
-//         pll.configure({
-//             onLoading: () => {},
-//             onSuccess: () => {},
-//         });
-//
-//         expect(Class.onLoading).not.toEqual(undefined);
-//         expect(Class.onSuccess).not.toEqual(undefined);
-//         expect(Class.onFail).toEqual(undefined);
-//     });
-//
-//     it('Has a function for "onLoading", "onSuccess", "onFail"', () => {
-//         pll.configure({
-//             onLoading: () => {},
-//             onSuccess: () => {},
-//             onFail: () => {},
-//         });
-//
-//         expect(Class.onLoading).not.toEqual(undefined);
-//         expect(Class.onSuccess).not.toEqual(undefined);
-//         expect(Class.onFail).not.toEqual(undefined);
-//     });
-// });
