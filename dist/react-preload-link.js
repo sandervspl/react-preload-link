@@ -17,12 +17,11 @@ var uuid = function uuid() {
 };
 
 // eslint-disable-next-line
-var c = {
-    ON_LOADING: 'onLoading',
-    ON_SUCCESS: 'onSuccess',
-    ON_FAIL: 'onFail',
-    PRELOAD_FAIL: 'preloadLink/fail'
-};
+var ON_LOADING = 'onLoading';
+var ON_SUCCESS = 'onSuccess';
+var ON_FAIL = 'onFail';
+var ON_NAVIGATE = 'onNavigate';
+var PRELOAD_FAIL$1 = 'preloadLink/fail';
 
 var asyncGenerator = function () {
   function AwaitValue(value) {
@@ -222,7 +221,7 @@ var possibleConstructorReturn = function (self, call) {
 };
 
 // let Preload Link know the fetch failed with this constant
-var PRELOAD_FAIL = c.PRELOAD_FAIL;
+var PRELOAD_FAIL = PRELOAD_FAIL$1;
 var PreloadLink$1 = function (_React$Component) {
     inherits(PreloadLink, _React$Component);
 
@@ -307,6 +306,10 @@ var PreloadLink$1 = function (_React$Component) {
 
 
             history.push(to);
+
+            if (PreloadLink[ON_NAVIGATE]) {
+                PreloadLink[ON_NAVIGATE]();
+            }
         };
 
         _this.prepareNavigation = function () {
@@ -337,17 +340,17 @@ var PreloadLink$1 = function (_React$Component) {
                 var preloadFailed = isArray ? result.includes(PRELOAD_FAIL) : result === PRELOAD_FAIL;
 
                 if (preloadFailed) {
-                    _this.update(c.ON_FAIL);
+                    _this.update(ON_FAIL);
                     _this.setLoaded();
                 } else {
-                    _this.update(c.ON_SUCCESS);
+                    _this.update(ON_SUCCESS);
                     _this.setLoaded(function () {
                         return _this.navigate();
                     });
                 }
             }).catch(function () {
                 // loading failed. Set in- and external states to reflect this
-                _this.update(c.ON_FAIL);
+                _this.update(ON_FAIL);
                 _this.setLoaded();
             });
         };
@@ -367,7 +370,7 @@ var PreloadLink$1 = function (_React$Component) {
                 _this.navigate();
             } else {
                 // fire external loading method
-                _this.update(c.ON_LOADING);
+                _this.update(ON_LOADING);
 
                 if (!_this.state.loading) {
                     // set internal loading state and prepare to navigate
@@ -423,9 +426,10 @@ PreloadLink$1.process = {
 };
 
 PreloadLink$1.init = function (options) {
-    PreloadLink$1[c.ON_LOADING] = options.onLoading;
-    PreloadLink$1[c.ON_SUCCESS] = options.onSuccess;
-    PreloadLink$1[c.ON_FAIL] = options.onFail;
+    PreloadLink$1[ON_LOADING] = options.onLoading;
+    PreloadLink$1[ON_SUCCESS] = options.onSuccess;
+    PreloadLink$1[ON_FAIL] = options.onFail;
+    PreloadLink$1[ON_NAVIGATE] = options.onNavigate;
 };
 
 PreloadLink$1.propTypes = {
@@ -457,7 +461,7 @@ var configure = PreloadLink$1.init;
 // component
 var PreloadLink$2 = reactRouterDom.withRouter(PreloadLink$1);
 
-PreloadLink$2.PRELOAD_FAIL = PRELOAD_FAIL;
+PreloadLink$2.PRELOAD_FAIL = PRELOAD_FAIL$1;
 PreloadLink$2.configure = configure;
 
 return PreloadLink$2;

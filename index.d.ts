@@ -4,6 +4,7 @@ export interface PreloadLinkConfigOptions {
     onLoading?: () => any;
     onSuccess?: () => any;
     onFail?: () => any;
+    onNavigate?: () => any;
 }
 
 export type PreloadLinkConfig = (options: PreloadLinkConfigOptions) => void;
@@ -17,6 +18,7 @@ export interface PreloadLinkProps {
     onLoading?: PreloadLinkLifecycleHook,
     onSuccess?: PreloadLinkLifecycleHook,
     onFail?: PreloadLinkLifecycleHook,
+    onNavigate?: PreloadLinkLifecycleHook,
     noInterrupt?: boolean,
 }
 export default class PreloadLink extends React.Component<PreloadLinkProps, any> {}

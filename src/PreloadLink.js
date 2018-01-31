@@ -11,6 +11,7 @@ class PreloadLink extends React.Component {
     static [c.ON_LOADING];
     static [c.ON_SUCCESS];
     static [c.ON_FAIL];
+    static [c.ON_NAVIGATE];
     static process = {
         uid: 0,
         busy: false,
@@ -23,6 +24,7 @@ class PreloadLink extends React.Component {
         PreloadLink[c.ON_LOADING] = options.onLoading;
         PreloadLink[c.ON_SUCCESS] = options.onSuccess;
         PreloadLink[c.ON_FAIL] = options.onFail;
+        PreloadLink[c.ON_NAVIGATE] = options.onNavigate;
     }
 
     constructor() {
@@ -100,6 +102,10 @@ class PreloadLink extends React.Component {
         const { history, to } = this.props;
 
         history.push(to);
+
+        if (PreloadLink[c.ON_NAVIGATE]) {
+            PreloadLink[c.ON_NAVIGATE]();
+        }
     }
 
     // prepares the page transition. Wait on all promises to resolve before changing route.

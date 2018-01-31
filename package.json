@@ -1,6 +1,6 @@
 {
     "name": "react-preload-link",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "A superversion of React Router's Link that preloads your data before navigating. Built with and for React.",
     "main": "lib/index.js",
     "jsnext:main": "dist/react-preload-link.js",
@@ -12,7 +12,9 @@
         "type": "git",
         "url": "https://github.com/sandervspl/react-preload-link.git"
     },
-    "dependencies": {},
+    "dependencies": {
+        "sinon": "^4.2.2"
+    },
     "devDependencies": {
         "babel-cli": "^6.26.0",
         "babel-core": "^6.26.0",
