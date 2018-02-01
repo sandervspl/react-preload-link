@@ -271,55 +271,43 @@ var PreloadLink$1 = function (_React$Component) {
             });
         };
 
-        _this.update = function (state) {
-            var method = PreloadLink[state];
-
-            // execution of lifecycle hooks
-            var execute = function execute(fn) {
-                if (!fn) return;
-
-                if (typeof fn !== 'function') {
-                    console.error('PreloadLink: Method for lifecycle \'' + state + '\' is not a function.');
-                } else {
-                    fn();
-                }
-            };
-
-            // update state and call lifecycle hook
-            if (_this.props[state]) {
-                // the override prop returns a function with the default lifecycle hooks as param.
-                _this.props[state](function () {
-                    return execute(method);
-                });
-                _this.setLoading();
-            } else {
-                _this.setLoading(function () {
-                    return execute(method);
-                });
-            }
-        };
-
         _this.navigate = function () {
             var _this$props = _this.props,
                 history = _this$props.history,
                 to = _this$props.to;
 
 
+            _this.executeHook(ON_NAVIGATE);
             history.push(to);
+        };
 
-            if (PreloadLink[ON_NAVIGATE]) {
-                PreloadLink[ON_NAVIGATE]();
+        _this.executeHook = function (state) {
+            var fn = PreloadLink[state];
+
+            if (!fn) return;
+
+            if (typeof fn !== 'function') {
+                console.error('PreloadLink: Method for lifecycle \'' + state + '\' is not a function.');
+            } else {
+                fn();
             }
         };
 
-        _this.handleFailed = function () {
-            _this.update(ON_FAIL);
-            _this.setLoaded();
-        };
+        _this.prepareHookCall = function (state) {
+            var fn = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : noop;
 
-        _this.returnsPromise = function (fn) {
-            var obj = fn();
-            return Promise.resolve(obj) === obj;
+            var setLoadState = state === ON_LOADING ? _this.setLoading : _this.setLoaded;
+            var hook = function hook() {
+                _this.executeHook(state);
+                fn();
+            };
+
+            if (_this.props[state]) {
+                setLoadState();
+                _this.props[state](hook);
+            } else {
+                setLoadState(hook);
+            }
         };
 
         _this.prepareNavigation = function () {
@@ -331,25 +319,11 @@ var PreloadLink$1 = function (_React$Component) {
 
             // create functions of our load props
             if (isArray) {
-                var loadList = [];
-                for (var i = 0; i < load.length; i += 1) {
-                    var fn = load[i];
-
-                    if (!_this.returnsPromise(fn)) {
-                        console.error('Error: Not all given functions are returning a Promise. Aborting navigation. ');
-                        return _this.handleFailed();
-                    }
-
-                    loadList.push(fn);
-                }
-
+                var loadList = load.map(function (fn) {
+                    return fn();
+                });
                 toLoad = Promise.all(loadList);
             } else {
-                if (!_this.returnsPromise(load)) {
-                    console.error('Error: Given load function does not return a Promise. Aborting navigation. ');
-                    return _this.handleFailed();
-                }
-
                 toLoad = load();
             }
 
@@ -364,16 +338,13 @@ var PreloadLink$1 = function (_React$Component) {
                 var preloadFailed = isArray ? result.includes(PRELOAD_FAIL) : result === PRELOAD_FAIL;
 
                 if (preloadFailed) {
-                    _this.handleFailed();
+                    _this.prepareHookCall(ON_FAIL);
                 } else {
-                    _this.update(ON_SUCCESS);
-                    _this.setLoaded(function () {
-                        return _this.navigate();
-                    });
+                    _this.prepareHookCall(ON_SUCCESS, _this.navigate);
                 }
             }).catch(function () {
                 // loading failed. Set in- and external states to reflect this
-                _this.handleFailed();
+                _this.prepareHookCall(ON_FAIL);
             });
         };
 
@@ -392,13 +363,10 @@ var PreloadLink$1 = function (_React$Component) {
                 _this.navigate();
             } else {
                 // fire external loading method
-                _this.update(ON_LOADING);
+                _this.prepareHookCall(ON_LOADING);
 
                 if (!_this.state.loading) {
-                    // set internal loading state and prepare to navigate
-                    _this.setLoading(function () {
-                        return _this.prepareNavigation();
-                    });
+                    _this.prepareNavigation();
                 }
             }
         };
@@ -414,10 +382,11 @@ var PreloadLink$1 = function (_React$Component) {
     // Initialize the lifecycle hooks
 
 
-    // update fetch state and execute lifecycle hooks
-
-
     // navigate with react-router to new URL
+
+
+    // NOTE: it's best to use prepareHookCall if you want to execute hooks,
+    // because it will ensure the correct loading state is set
 
 
     // prepares the page transition. Wait on all promises to resolve before changing route.
@@ -448,25 +417,22 @@ PreloadLink$1.process = {
 };
 
 PreloadLink$1.init = function (options) {
-    PreloadLink$1[ON_LOADING] = options.onLoading;
-    PreloadLink$1[ON_SUCCESS] = options.onSuccess;
-    PreloadLink$1[ON_FAIL] = options.onFail;
-    PreloadLink$1[ON_NAVIGATE] = options.onNavigate;
+    PreloadLink$1[ON_LOADING] = options[ON_LOADING];
+    PreloadLink$1[ON_SUCCESS] = options[ON_SUCCESS];
+    PreloadLink$1[ON_FAIL] = options[ON_FAIL];
+    PreloadLink$1[ON_NAVIGATE] = options[ON_NAVIGATE];
 };
 
 PreloadLink$1.propTypes = {
     children: PT.any,
     history: PT.shape({
-        // eslint-disable-next-line react/no-unused-prop-types
         push: PT.func
     }),
     load: PT.oneOfType([PT.func, PT.arrayOf(PT.func)]),
     to: PT.string.isRequired,
-    /* eslint-disable react/no-unused-prop-types */
     onLoading: PT.func,
     onSuccess: PT.func,
     onFail: PT.func,
-    /* eslint-enable */
     noInterrupt: PT.bool
 };
 
