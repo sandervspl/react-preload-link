@@ -8,6 +8,7 @@ import sinon from 'sinon';
 
 import PreloadLink, * as pll from 'react-preload-link';
 import Root from '../examples/src/Root';
+import { PRELOAD_FAIL } from 'react-preload-link';
 
 // configure enzyme
 configure({ adapter: new Adapter() });
@@ -39,7 +40,9 @@ describe('<PreloadLink>', () => {
         resolve();
     }, LOAD_DELAY));
 
-    const timeoutFnFail = () => new Promise((_, reject) => setTimeout(() => reject(), LOAD_DELAY));
+    const timeoutFnFail = () => new Promise((_, reject) => (
+        setTimeout(() => reject(PRELOAD_FAIL)
+    ), LOAD_DELAY));
 
     const getPreloadLink = () => (
         wrapper.find(PreloadLink)
@@ -170,12 +173,12 @@ describe('<PreloadLink>', () => {
             link = getPreloadLink();
         });
 
-        it('Directly navigate to "page1" after a click without load function', () => {
+        it('Directly navigates to "page1" after a click without load function', () => {
             link.at(0).simulate('click');
             expect(getPathname()).toEqual('/page1');
         });
 
-        it(`Navigate to "/page2" after ${LOAD_DELAY}ms`, (done) => {
+        it(`Navigates to "/page2" after ${LOAD_DELAY}ms with timeout function`, (done) => {
             expect.assertions(2);
             //
             pll.configure({
@@ -192,8 +195,8 @@ describe('<PreloadLink>', () => {
             clock.tick(LOAD_DELAY);
         });
 
-        it('Clicking a link does not interrupt a uninterruptable link and routes to correct route', (done) => {
-            expect.assertions(1);
+        it('Is not possible to interrupt an uninterruptable link', (done) => {
+            expect.assertions(4);
 
             pll.configure({
                 onNavigate: () => {
@@ -205,20 +208,13 @@ describe('<PreloadLink>', () => {
             link.at(2).simulate('click'); // with noInterrupt
             link.at(0).simulate('click'); // without
             clock.tick(LOAD_DELAY);
-        });
-
-        it('Subsequent click(s) when a link is uninterruptable will not trigger new load function(s)', () => {
-            link.at(2).simulate('click');
-            link.at(3).simulate('click');
-
-            clock.tick(LOAD_DELAY);
 
             expect(PreloadLinkObj.process.busy).toBe(true);
             expect(PreloadLinkObj.process.canCancel).toBe(false);
             expect(fakeFn.notCalled).toBe(true);
         });
 
-        it('Wait for all load functions before navigating', (done) => {
+        it('Waits for all load Promises to resolve before navigating', (done) => {
             expect.assertions(3);
 
             pll.configure({
@@ -233,6 +229,28 @@ describe('<PreloadLink>', () => {
 
             expect(getPathname()).not.toEqual('/page5');
 
+            clock.tick(LOAD_DELAY);
+        });
+
+        it('Safely fails when a Promise from an array rejects with PRELOAD_FAIL', (done) => {
+            expect.assertions(1);
+
+            pll.configure({
+                onFail: () => {
+                    fakeFn();
+
+                    expect(fakeFn.calledOnce).toBe(true);
+                    done();
+                },
+            });
+
+            wrapper = mount(
+                <Router>
+                    <PreloadLink to="page1" load={[timeoutFn, timeoutFnFail]} />
+                </Router>
+            );
+
+            getPreloadLink().simulate('click');
             clock.tick(LOAD_DELAY);
         });
     });
