@@ -277,8 +277,8 @@ var PreloadLink$1 = function (_React$Component) {
                 to = _this$props.to;
 
 
-            _this.executeHook(ON_NAVIGATE);
             history.push(to);
+            _this.executeHook(ON_NAVIGATE);
         };
 
         _this.executeHook = function (state) {
@@ -350,7 +350,6 @@ var PreloadLink$1 = function (_React$Component) {
 
         _this.handleClick = function (e) {
             var process = PreloadLink.process;
-
             // prevents navigation
 
             e.preventDefault();

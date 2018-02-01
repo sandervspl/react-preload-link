@@ -76,8 +76,8 @@ class PreloadLink extends React.Component {
     navigate = () => {
         const { history, to } = this.props;
 
-        this.executeHook(c.ON_NAVIGATE);
         history.push(to);
+        this.executeHook(c.ON_NAVIGATE);
     }
 
     // NOTE: it's best to use prepareHookCall if you want to execute hooks,
@@ -151,7 +151,6 @@ class PreloadLink extends React.Component {
 
     handleClick = (e) => {
         const { process } = PreloadLink;
-
         // prevents navigation
         e.preventDefault();
 
