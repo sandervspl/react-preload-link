@@ -41,8 +41,8 @@ describe('<PreloadLink>', () => {
     }, LOAD_DELAY));
 
     const timeoutFnFail = () => new Promise((_, reject) => (
-        setTimeout(() => reject(PRELOAD_FAIL)
-    ), LOAD_DELAY));
+        setTimeout(() => reject(PRELOAD_FAIL), LOAD_DELAY)
+    ));
 
     const getPreloadLink = () => (
         wrapper.find(PreloadLink)
