@@ -21,10 +21,10 @@ class PreloadLink extends React.Component {
 
     // Initialize the lifecycle hooks
     static init = (options) => {
-        PreloadLink[c.ON_LOADING] = options.onLoading;
-        PreloadLink[c.ON_SUCCESS] = options.onSuccess;
-        PreloadLink[c.ON_FAIL] = options.onFail;
-        PreloadLink[c.ON_NAVIGATE] = options.onNavigate;
+        PreloadLink[c.ON_LOADING] = options[c.ON_LOADING];
+        PreloadLink[c.ON_SUCCESS] = options[c.ON_SUCCESS];
+        PreloadLink[c.ON_FAIL] = options[c.ON_FAIL];
+        PreloadLink[c.ON_NAVIGATE] = options[c.ON_NAVIGATE];
     }
 
     constructor() {
@@ -72,50 +72,41 @@ class PreloadLink extends React.Component {
         this.setState({ loading: false }, () => callback());
     }
 
-    // update fetch state and execute lifecycle hooks
-    update = (state) => {
-        const method = PreloadLink[state];
-
-        // execution of lifecycle hooks
-        const execute = (fn) => {
-            if (!fn) return;
-
-            if (typeof fn !== 'function') {
-                console.error(`PreloadLink: Method for lifecycle '${state}' is not a function.`);
-            } else {
-                fn();
-            }
-        };
-
-        // update state and call lifecycle hook
-        if (this.props[state]) {
-            // the override prop returns a function with the default lifecycle hooks as param.
-            this.props[state](() => execute(method));
-            this.setLoading();
-        } else {
-            this.setLoading(() => execute(method));
-        }
-    }
-
     // navigate with react-router to new URL
     navigate = () => {
         const { history, to } = this.props;
 
+        this.executeHook(c.ON_NAVIGATE);
         history.push(to);
+    }
 
-        if (PreloadLink[c.ON_NAVIGATE]) {
-            PreloadLink[c.ON_NAVIGATE]();
+    // NOTE: it's best to use prepareHookCall if you want to execute hooks,
+    // because it will ensure the correct loading state is set
+    executeHook = (state) => {
+        const fn = PreloadLink[state];
+
+        if (!fn) return;
+
+        if (typeof fn !== 'function') {
+            console.error(`PreloadLink: Method for lifecycle '${state}' is not a function.`);
+        } else {
+            fn();
         }
-    }
+    };
 
-    handleFailed = () => {
-        this.update(c.ON_FAIL);
-        this.setLoaded();
-    }
+    prepareHookCall = (state, fn = noop) => {
+        const setLoadState = state === c.ON_LOADING ? this.setLoading : this.setLoaded;
+        const hook = () => {
+            this.executeHook(state);
+            fn();
+        };
 
-    returnsPromise = (fn) => {
-        const obj = fn();
-        return Promise.resolve(obj) === obj;
+        if (this.props[state]) {
+            setLoadState();
+            this.props[state](hook);
+        } else {
+            setLoadState(hook);
+        }
     }
 
     // prepares the page transition. Wait on all promises to resolve before changing route.
@@ -127,25 +118,9 @@ class PreloadLink extends React.Component {
 
         // create functions of our load props
         if (isArray) {
-            const loadList = [];
-            for (let i = 0; i < load.length; i += 1) {
-                const fn = load[i];
-
-                if (!this.returnsPromise(fn)) {
-                    console.error('Error: Not all given functions are returning a Promise. Aborting navigation. ');
-                    return this.handleFailed();
-                }
-
-                loadList.push(fn);
-            }
-
+            const loadList = load.map(fn => fn());
             toLoad = Promise.all(loadList);
         } else {
-            if (!this.returnsPromise(load)) {
-                console.error('Error: Given load function does not return a Promise. Aborting navigation. ');
-                return this.handleFailed();
-            }
-
             toLoad = load();
         }
 
@@ -163,15 +138,14 @@ class PreloadLink extends React.Component {
                     : result === PRELOAD_FAIL;
 
                 if (preloadFailed) {
-                    this.handleFailed();
+                    this.prepareHookCall(c.ON_FAIL);
                 } else {
-                    this.update(c.ON_SUCCESS);
-                    this.setLoaded(() => this.navigate());
+                    this.prepareHookCall(c.ON_SUCCESS, this.navigate);
                 }
             })
             .catch(() => {
                 // loading failed. Set in- and external states to reflect this
-                this.handleFailed();
+                this.prepareHookCall(c.ON_FAIL);
             });
     }
 
@@ -189,11 +163,10 @@ class PreloadLink extends React.Component {
             this.navigate();
         } else {
             // fire external loading method
-            this.update(c.ON_LOADING);
+            this.prepareHookCall(c.ON_LOADING);
 
             if (!this.state.loading) {
-                // set internal loading state and prepare to navigate
-                this.setLoading(() => this.prepareNavigation());
+                this.prepareNavigation();
             }
         }
     }
@@ -211,16 +184,13 @@ class PreloadLink extends React.Component {
 PreloadLink.propTypes = {
     children: PT.any,
     history: PT.shape({
-        // eslint-disable-next-line react/no-unused-prop-types
         push: PT.func,
     }),
     load: PT.oneOfType([PT.func, PT.arrayOf(PT.func)]),
     to: PT.string.isRequired,
-    /* eslint-disable react/no-unused-prop-types */
     onLoading: PT.func,
     onSuccess: PT.func,
     onFail: PT.func,
-    /* eslint-enable */
     noInterrupt: PT.bool,
 };
 
