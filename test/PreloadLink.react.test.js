@@ -33,7 +33,6 @@ describe('<PreloadLink>', () => {
     let resolves;
 
     const PreloadLinkObj = PreloadLink.WrappedComponent;
-    const fakeFn = sinon.spy();
 
     const timeoutFn = () => new Promise((resolve) => setTimeout(() => {
         resolves.push(true);
@@ -52,6 +51,14 @@ describe('<PreloadLink>', () => {
         wrapper.instance().history.location.pathname
     );
 
+    const createRouterWrapper = (Component) => {
+        wrapper = mount(
+            <Router>
+                {Component}
+            </Router>
+        )
+    };
+
     beforeEach(() => {
         pll.configure({});
         resolves = [];
@@ -64,12 +71,7 @@ describe('<PreloadLink>', () => {
 
     describe('Props', () => {
         beforeEach(() => {
-            wrapper = mount(
-                <Router>
-                    <PreloadLink to="page1" />
-                </Router>
-            );
-
+            createRouterWrapper(<PreloadLink to="page1" />);
             link = getPreloadLink();
         });
 
@@ -84,11 +86,8 @@ describe('<PreloadLink>', () => {
 
     describe('Configuration', () => {
         beforeEach(() => {
-            wrapper = mount(
-                <Router>
-                    <PreloadLink to="page1" load={timeoutFn} />
-                </Router>
-            );
+            createRouterWrapper(<PreloadLink to="page1" load={timeoutFn} />);
+            link = getPreloadLink();
         });
 
         it('Does not crash without configuration', (done) => {
@@ -101,7 +100,7 @@ describe('<PreloadLink>', () => {
                 },
             });
 
-            getPreloadLink().simulate('click');
+            link.simulate('click');
             clock.tick(LOAD_DELAY);
         });
 
@@ -122,11 +121,14 @@ describe('<PreloadLink>', () => {
                 },
             });
 
-            getPreloadLink().simulate('click');
+            link.simulate('click');
             clock.tick(LOAD_DELAY);
         });
 
         it('Calls correct lifecycle hook on failed navigation', (done) => {
+            createRouterWrapper(<PreloadLink to="page1" load={timeoutFnFail} />);
+            link = getPreloadLink();
+
             expect.assertions(2);
 
             const fn1 = sinon.spy();
@@ -145,112 +147,98 @@ describe('<PreloadLink>', () => {
                 },
             });
 
-            wrapper = mount(
-                <Router>
-                    <PreloadLink to="page1" load={timeoutFnFail} />
-                </Router>
-            );
-
-            getPreloadLink().simulate('click');
+            link.simulate('click');
             clock.tick(LOAD_DELAY);
         });
     });
 
     describe('Navigating', () => {
-        beforeEach(() => {
-            wrapper = mount(
-                <Router>
-                    <Fragment>
-                        <PreloadLink to="page1" />
-                        <PreloadLink to="page2" />
-                        <PreloadLink to="page3" noInterrupt load={timeoutFn} />
-                        <PreloadLink to="page4" load={fakeFn} />
-                        <PreloadLink to="page5" load={[timeoutFn, timeoutFn]} />
-                    </Fragment>
-                </Router>
-            );
-
-            link = getPreloadLink();
-        });
-
         it('Directly navigates to "page1" after a click without load function', () => {
-            link.at(0).simulate('click');
+            createRouterWrapper(<PreloadLink to="page1" />);
+            getPreloadLink().simulate('click');
+
             expect(getPathname()).toEqual('/page1');
         });
 
-        it(`Navigates to "/page2" after ${LOAD_DELAY}ms with timeout function`, (done) => {
+        it(`Navigates to "/page1" after ${LOAD_DELAY}ms with timeout function`, (done) => {
             expect.assertions(2);
-            //
+
+            createRouterWrapper(<PreloadLink to="page1" load={timeoutFn} />);
+
             pll.configure({
                 onNavigate: () => {
-                    expect(getPathname()).toEqual('/page2');
+                    expect(getPathname()).toEqual('/page1');
                     done();
                 },
             });
 
-            link.at(1).simulate('click');
+            getPreloadLink().simulate('click');
 
-            expect(getPathname()).toEqual('/page2');
+            expect(getPathname()).toEqual('/');
 
             clock.tick(LOAD_DELAY);
         });
 
-        it('Is not possible to interrupt an uninterruptable link', (done) => {
+        it('Is impossible to interrupt an uninterruptable link', (done) => {
             expect.assertions(4);
+
+            const loadCb = sinon.spy();
+            createRouterWrapper(
+                <Fragment>
+                    <PreloadLink to="page1" noInterrupt load={timeoutFn} />
+                    <PreloadLink to="page2" load={loadCb} />
+                </Fragment>
+            )
+
+            link = getPreloadLink();
 
             pll.configure({
                 onNavigate: () => {
-                    expect(getPathname()).toEqual('/page3');
+                    expect(getPathname()).toEqual('/page1');
                     done();
                 },
             });
 
-            link.at(2).simulate('click'); // with noInterrupt
-            link.at(0).simulate('click'); // without
+            link.at(0).simulate('click'); // with noInterrupt
+            link.at(1).simulate('click'); // without
             clock.tick(LOAD_DELAY);
 
             expect(PreloadLinkObj.process.busy).toBe(true);
             expect(PreloadLinkObj.process.canCancel).toBe(false);
-            expect(fakeFn.notCalled).toBe(true);
+            expect(loadCb.notCalled).toBe(true);
         });
 
         it('Waits for all load Promises to resolve before navigating', (done) => {
             expect.assertions(3);
 
+            createRouterWrapper(<PreloadLink to="page1" load={[timeoutFn, timeoutFn]} />);
+
             pll.configure({
                 onNavigate: () => {
                     expect(resolves.length).toEqual(2);
-                    expect(getPathname()).toEqual('/page5');
+                    expect(getPathname()).toEqual('/page1');
                     done();
-                },
+                }
             });
 
-            link.at(4).simulate('click');
+            getPreloadLink().simulate('click');
 
-            expect(getPathname()).not.toEqual('/page5');
+            expect(getPathname()).not.toEqual('/page1');
 
             clock.tick(LOAD_DELAY);
         });
 
         it('Safely fails when a Promise from an array rejects with PRELOAD_FAIL', (done) => {
-            expect.assertions(1);
-
             pll.configure({
                 onFail: () => {
-                    fakeFn();
-
-                    expect(fakeFn.calledOnce).toBe(true);
                     done();
                 },
             });
 
-            wrapper = mount(
-                <Router>
-                    <PreloadLink to="page1" load={[timeoutFn, timeoutFnFail]} />
-                </Router>
-            );
+            createRouterWrapper(<PreloadLink to="page1" load={[timeoutFn, timeoutFnFail]} />);
 
             getPreloadLink().simulate('click');
+
             clock.tick(LOAD_DELAY);
         });
     });
