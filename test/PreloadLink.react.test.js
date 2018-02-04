@@ -241,5 +241,18 @@ describe('<PreloadLink>', () => {
 
             clock.tick(LOAD_DELAY);
         });
+
+        it('Returns correct data from loadMiddleware', (done) => {
+            expect.assertions(1);
+            const loadFn = () => new Promise((resolve) => resolve(10));
+            const loadMiddleware = (data) => {
+                expect(data).toEqual(10);
+                done();
+            }
+
+            createRouterWrapper(<PreloadLink to="page1" load={loadFn} loadMiddleware={loadMiddleware} />);
+
+            clock.tick(10);
+        });
     });
 });
