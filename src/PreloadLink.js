@@ -109,6 +109,10 @@ class PreloadLink extends React.Component {
         }
     }
 
+    unwrapWithMiddleware = (fn) => {
+        return fn().then((data) => this.props.loadMiddleware(data));
+    }
+
     // prepares the page transition. Wait on all promises to resolve before changing route.
     prepareNavigation = () => {
         const { process } = PreloadLink;
@@ -118,10 +122,10 @@ class PreloadLink extends React.Component {
 
         // create functions of our load props
         if (isArray) {
-            const loadList = load.map(fn => fn());
+            const loadList = load.map(fn => this.unwrapWithMiddleware(fn));
             toLoad = Promise.all(loadList);
         } else {
-            toLoad = load();
+            toLoad = this.unwrapWithMiddleware(load);
         }
 
         // wait for all async functions to resolve
@@ -191,6 +195,7 @@ PreloadLink.propTypes = {
     onSuccess: PT.func,
     onFail: PT.func,
     noInterrupt: PT.bool,
+    loadMiddleware: PT.func,
 };
 
 PreloadLink.defaultProps = {
@@ -198,6 +203,7 @@ PreloadLink.defaultProps = {
     onSuccess: null,
     onFail: null,
     noInterrupt: false,
+    loadMiddleware: noop,
 };
 
 // component initialization function

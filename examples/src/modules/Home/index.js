@@ -2,6 +2,7 @@ import React from 'react';
 import PT from 'prop-types';
 import PreloadLink, { PRELOAD_FAIL } from 'react-preload-link';
 import { connect } from 'react-redux';
+import NProgress from 'nprogress';
 import { setSuccess, setLoading, setFailed } from '../../ducks/app';
 import { getSwapiPerson } from '../../ducks/swapi';
 
@@ -140,6 +141,9 @@ class Home extends React.Component {
                             <PreloadLink
                                 to={`profile/${personIdList}`}
                                 load={loadList}
+                                loadMiddleware={() => {
+                                    NProgress.inc(1 / personIdList.length);
+                                }}
                             >
                                 To Star Wars person page
                             </PreloadLink>
