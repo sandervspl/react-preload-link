@@ -420,5 +420,7 @@ describe('<PreloadLink>', () => {
 
             click();
         });
+
+        it('Stops onClick')
     });
 });
