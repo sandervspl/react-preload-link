@@ -93,18 +93,16 @@ describe('<PreloadLink>', () => {
         it('Does not crash without configuration', (done) => {
             expect.assertions(1);
 
-            pll.configure({
-                onNavigate: () => {
-                    expect(getPathname()).toEqual('/page1');
-                    done();
-                },
-            });
-
             link.simulate('click');
             clock.tick(LOAD_DELAY);
+
+            process.nextTick(() => {
+                expect(getPathname()).toEqual('/page1');
+                done();
+            });
         });
 
-        it('Calls correct lifecycle hooks on succesful navigation', (done) => {
+        it('Calls correct lifecycle hooks on successful navigation', (done) => {
             expect.assertions(2);
 
             const fn1 = sinon.spy();
@@ -114,15 +112,16 @@ describe('<PreloadLink>', () => {
                 onLoading: fn1,
                 onSuccess: fn1,
                 onFail: fn2,
-                onNavigate: () => {
-                    expect(fn1.calledTwice).toBe(true);
-                    expect(fn2.notCalled).toBe(true);
-                    done();
-                },
             });
 
             link.simulate('click');
             clock.tick(LOAD_DELAY);
+
+            process.nextTick(() => {
+                expect(fn1.calledTwice).toBe(true);
+                expect(fn2.notCalled).toBe(true);
+                done();
+            });
         });
 
         it('Calls correct lifecycle hook on failed navigation', (done) => {
@@ -137,18 +136,18 @@ describe('<PreloadLink>', () => {
             pll.configure({
                 onLoading: fn1,
                 onSuccess: fn1,
-                onFail: () => {
-                    fn2();
-
-                    expect(fn1.calledOnce).toBe(true);
-                    expect(fn2.calledOnce).toBe(true);
-
-                    done();
-                },
+                onFail: fn2,
             });
 
             link.simulate('click');
             clock.tick(LOAD_DELAY);
+
+            process.nextTick(() => {
+                expect(fn1.calledOnce).toBe(true);
+                expect(fn2.calledOnce).toBe(true);
+
+                done();
+            });
         });
     });
 
@@ -165,18 +164,16 @@ describe('<PreloadLink>', () => {
 
             createRouterWrapper(<PreloadLink to="page1" load={timeoutFn} />);
 
-            pll.configure({
-                onNavigate: () => {
-                    expect(getPathname()).toEqual('/page1');
-                    done();
-                },
-            });
-
             getPreloadLink().simulate('click');
 
             expect(getPathname()).toEqual('/');
 
             clock.tick(LOAD_DELAY);
+
+            process.nextTick(() => {
+                expect(getPathname()).toEqual('/page1');
+                done();
+            });
         });
 
         it('Is impossible to interrupt an uninterruptable link', (done) => {
@@ -192,13 +189,6 @@ describe('<PreloadLink>', () => {
 
             link = getPreloadLink();
 
-            pll.configure({
-                onNavigate: () => {
-                    expect(getPathname()).toEqual('/page1');
-                    done();
-                },
-            });
-
             link.at(0).simulate('click'); // with noInterrupt
             link.at(1).simulate('click'); // without
             clock.tick(LOAD_DELAY);
@@ -206,6 +196,11 @@ describe('<PreloadLink>', () => {
             expect(PreloadLinkObj.process.busy).toBe(true);
             expect(PreloadLinkObj.process.canCancel).toBe(false);
             expect(loadCb.notCalled).toBe(true);
+
+            process.nextTick(() => {
+                expect(getPathname()).toEqual('/page1');
+                done();
+            });
         });
 
         it('Waits for all load Promises to resolve before navigating', (done) => {
@@ -213,19 +208,17 @@ describe('<PreloadLink>', () => {
 
             createRouterWrapper(<PreloadLink to="page1" load={[timeoutFn, timeoutFn]} />);
 
-            pll.configure({
-                onNavigate: () => {
-                    expect(resolves.length).toEqual(2);
-                    expect(getPathname()).toEqual('/page1');
-                    done();
-                }
-            });
-
             getPreloadLink().simulate('click');
 
             expect(getPathname()).not.toEqual('/page1');
 
             clock.tick(LOAD_DELAY);
+
+            process.nextTick(() => {
+                expect(resolves.length).toEqual(2);
+                expect(getPathname()).toEqual('/page1');
+                done();
+            });
         });
 
         it('Safely fails when a Promise from an array rejects with PRELOAD_FAIL', (done) => {
