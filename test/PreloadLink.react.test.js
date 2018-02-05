@@ -19,13 +19,6 @@ jest.setTimeout(200);
 // constants
 const LOAD_DELAY = 100;
 
-describe('App', () => {
-    it('Renders without crashing', () => {
-        const div = document.createElement('div');
-        ReactDOM.render(<Root />, div);
-    });
-});
-
 describe('<PreloadLink>', () => {
     let wrapper;
     let link;
@@ -71,13 +64,13 @@ describe('<PreloadLink>', () => {
         clock.restore();
     });
 
-    describe('Props', () => {
-        it('Renders a <PreloadLink> component', () => {
-            mountWithRouter(<PreloadLink to="page1" />);
-            expect(getPreloadLink().length).toEqual(1);
-        });
+    it('Renders a <PreloadLink> component', () => {
+        mountWithRouter(<PreloadLink to="page1" />);
+        expect(getPreloadLink().length).toEqual(1);
+    });
 
-        it('Prop "noInterrupt" default value is "false"', () => {
+    describe('Props', () => {
+        it('noInterrupt default value is false', () => {
             expect(PreloadLink.WrappedComponent.defaultProps.noInterrupt).toEqual(false);
         });
 
@@ -124,6 +117,71 @@ describe('<PreloadLink>', () => {
 
             process.nextTick(() => {
                 expect(fn.callCount).toEqual(2);
+                done();
+            });
+        });
+
+        it('Receive related function from configure on lifecycle prop functions', (done) => {
+            expect.assertions(3);
+
+            const fnLoad = sinon.spy();
+            const fnSuccess = sinon.spy();
+            const fnOnNavigate = sinon.spy();
+
+            const handleLoading = (load) => load();
+            const handleSuccess = (success) => success();
+            const handleNavigate = (navigate) => navigate();
+
+            rpl.configure({
+                onLoading: fnLoad,
+                onSuccess: fnSuccess,
+                onNavigate: fnOnNavigate,
+            });
+
+            mountWithRouter(
+                <PreloadLink
+                    to="/page1"
+                    load={timeoutFn}
+                    onLoading={handleLoading}
+                    onSuccess={handleSuccess}
+                    onNavigate={handleNavigate}
+                />
+            );
+
+            click();
+            clock.tick(LOAD_DELAY);
+
+            process.nextTick(() => {
+                expect(fnLoad.calledOnce).toBe(true);
+                expect(fnSuccess.calledOnce).toBe(true);
+                expect(fnOnNavigate.calledOnce).toBe(true);
+                done();
+            });
+        });
+
+        it('Receives related function from configure on onFail lifecycle prop function', (done) => {
+            expect.assertions(1);
+
+            const fnFail = sinon.spy();
+            const handleFail = (fail) => fail();
+
+            rpl.configure({
+                onFail: fnFail,
+            });
+
+            mountWithRouter(
+                <PreloadLink
+                    to="/page1"
+                    load={timeoutFnFail}
+                    onFail={handleFail}
+                />
+            );
+
+            click();
+            clock.tick(LOAD_DELAY);
+
+            process.nextTick(() => {
+                expect(fnFail.calledOnce).toBe(true);
                 done();
             });
         });
@@ -254,7 +312,7 @@ describe('<PreloadLink>', () => {
     });
 
     describe('Navigating', () => {
-        it('Directly navigates to "page1" after a click without load function', () => {
+        it('Directly navigates to "/page1" after a click without load function', () => {
             mountWithRouter(<PreloadLink to="page1" />);
             click();
 
