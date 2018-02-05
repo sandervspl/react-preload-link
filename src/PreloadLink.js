@@ -159,8 +159,12 @@ class PreloadLink extends React.Component {
 
     handleClick = (e) => {
         const { process } = PreloadLink;
+        const { onClick } = this.props;
+
         // prevents navigation
         e.preventDefault();
+
+        onClick();
 
         // prevent navigation if we can't override a load with a new click
         if (process.busy && !process.canCancel) return;
@@ -211,6 +215,7 @@ PreloadLink.propTypes = {
     className: PT.string,
     navLink: PT.bool,
     activeClassName: PT.string,
+    onClick: PT.func,
 };
 
 PreloadLink.defaultProps = {
@@ -220,6 +225,7 @@ PreloadLink.defaultProps = {
     noInterrupt: false,
     loadMiddleware: noop,
     navLink: false,
+    onClick: noop,
 };
 
 // component initialization function
