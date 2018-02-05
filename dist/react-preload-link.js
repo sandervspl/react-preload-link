@@ -399,11 +399,12 @@ var PreloadLink$1 = function (_React$Component) {
         value: function render() {
             var _props = this.props,
                 to = _props.to,
-                children = _props.children;
+                children = _props.children,
+                className = _props.className;
 
             return React.createElement(
                 reactRouterDom.Link,
-                { to: to, onClick: this.handleClick },
+                { className: className, to: to, onClick: this.handleClick },
                 children
             );
         }
@@ -436,7 +437,8 @@ PreloadLink$1.propTypes = {
     onSuccess: PT.func,
     onFail: PT.func,
     noInterrupt: PT.bool,
-    loadMiddleware: PT.func
+    loadMiddleware: PT.func,
+    className: PT.string
 };
 
 PreloadLink$1.defaultProps = {

@@ -178,9 +178,9 @@ class PreloadLink extends React.Component {
     }
 
     render() {
-        const { to, children } = this.props;
+        const { to, children, className } = this.props;
         return (
-            <Link to={to} onClick={this.handleClick}>
+            <Link className={className} to={to} onClick={this.handleClick}>
                 {children}
             </Link>
         );
@@ -199,6 +199,7 @@ PreloadLink.propTypes = {
     onFail: PT.func,
     noInterrupt: PT.bool,
     loadMiddleware: PT.func,
+    className: PT.string,
 };
 
 PreloadLink.defaultProps = {

@@ -1,6 +1,6 @@
 {
     "name": "react-preload-link",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "description": "A superversion of React Router's Link that preloads your data before navigating. Built with and for React.",
     "main": "lib/index.js",
     "jsnext:main": "dist/react-preload-link.js",
