@@ -138,6 +138,15 @@ describe('<PreloadLink>', () => {
             createRouterWrapper(<PreloadLink to="/" navLink activeClassName="active" />);
             expect(getPreloadLink().hasClass('active')).toBe(true);
         }*/);
+
+        it('Calls onClick function', () => {
+            const fn = sinon.spy();
+            createRouterWrapper(<PreloadLink to="/page1" onClick={fn} />);
+
+            click();
+
+            expect(fn.calledOnce).toBe(true);
+        });
     });
 
     describe('Configuration', () => {
