@@ -369,10 +369,10 @@ var PreloadLink$1 = function (_React$Component) {
 
             e.preventDefault();
 
-            onClick();
-
             // prevent navigation if we can't override a load with a new click
             if (process.busy && !process.canCancel) return;
+
+            onClick();
 
             if (!_this.props.load) {
                 // nothing to load -- we can navigate
@@ -419,7 +419,6 @@ var PreloadLink$1 = function (_React$Component) {
                 activeClassName = _props.activeClassName;
 
             var Element = navLink ? reactRouterDom.NavLink : reactRouterDom.Link;
-
             var props = {};
 
             if (navLink) {
