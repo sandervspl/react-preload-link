@@ -332,6 +332,7 @@ var PreloadLink$1 = function (_React$Component) {
 
             // wait for all async functions to resolve
             // set in- and external loading states and proceed to navigation if successful
+            // TODO: give error if function does not return a promise with explanation
             toLoad.then(function (result) {
                 // do not perform further navigation if this was ordered for cancel
                 if (process.cancelUid === _this.uid) {
@@ -400,11 +401,21 @@ var PreloadLink$1 = function (_React$Component) {
             var _props = this.props,
                 to = _props.to,
                 children = _props.children,
-                className = _props.className;
+                navLink = _props.navLink,
+                className = _props.className,
+                activeClassName = _props.activeClassName;
+
+            var Element = navLink ? reactRouterDom.NavLink : reactRouterDom.Link;
+
+            var props = {};
+
+            if (navLink) {
+                props.activeClassName = activeClassName;
+            }
 
             return React.createElement(
-                reactRouterDom.Link,
-                { className: className, to: to, onClick: this.handleClick },
+                Element,
+                _extends({ className: className, to: to, onClick: this.handleClick }, props),
                 children
             );
         }
@@ -438,7 +449,9 @@ PreloadLink$1.propTypes = {
     onFail: PT.func,
     noInterrupt: PT.bool,
     loadMiddleware: PT.func,
-    className: PT.string
+    className: PT.string,
+    navLink: PT.bool,
+    activeClassName: PT.string
 };
 
 PreloadLink$1.defaultProps = {
@@ -446,7 +459,8 @@ PreloadLink$1.defaultProps = {
     onSuccess: null,
     onFail: null,
     noInterrupt: false,
-    loadMiddleware: noop
+    loadMiddleware: noop,
+    navLink: false
 };
 
 // component initialization function

@@ -1,6 +1,6 @@
 import React from 'react';
 import PT from 'prop-types';
-import { withRouter, Link } from 'react-router-dom';
+import { withRouter, Link, NavLink } from 'react-router-dom';
 import { uuid, noop } from './helpers';
 import * as c from './constants';
 
@@ -133,6 +133,7 @@ class PreloadLink extends React.Component {
 
         // wait for all async functions to resolve
         // set in- and external loading states and proceed to navigation if successful
+        // TODO: give error if function does not return a promise with explanation
         toLoad
             .then((result) => {
                 // do not perform further navigation if this was ordered for cancel
@@ -178,11 +179,19 @@ class PreloadLink extends React.Component {
     }
 
     render() {
-        const { to, children, className } = this.props;
+        const { to, children, navLink, className, activeClassName } = this.props;
+        const Element = navLink ? NavLink : Link;
+
+        const props = {};
+
+        if (navLink) {
+            props.activeClassName = activeClassName;
+        }
+
         return (
-            <Link className={className} to={to} onClick={this.handleClick}>
+            <Element className={className} to={to} onClick={this.handleClick} {...props}>
                 {children}
-            </Link>
+            </Element>
         );
     }
 }
@@ -200,6 +209,8 @@ PreloadLink.propTypes = {
     noInterrupt: PT.bool,
     loadMiddleware: PT.func,
     className: PT.string,
+    navLink: PT.bool,
+    activeClassName: PT.string,
 };
 
 PreloadLink.defaultProps = {
@@ -208,6 +219,7 @@ PreloadLink.defaultProps = {
     onFail: null,
     noInterrupt: false,
     loadMiddleware: noop,
+    navLink: false,
 };
 
 // component initialization function

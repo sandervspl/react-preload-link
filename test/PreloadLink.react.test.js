@@ -273,5 +273,8 @@ describe('<PreloadLink>', () => {
 
         // TODO
         it('Calls prop callback function if it exists');
+
+        // TODO
+        it('Receives activeClassName as NavLink on current route');
     });
 });
