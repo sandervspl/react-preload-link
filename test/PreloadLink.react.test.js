@@ -59,6 +59,8 @@ describe('<PreloadLink>', () => {
         )
     };
 
+    const click = () => getPreloadLink().simulate('click');
+
     beforeEach(() => {
         rpl.configure({});
         resolves = [];
@@ -94,7 +96,7 @@ describe('<PreloadLink>', () => {
                 />
             );
 
-            getPreloadLink().simulate('click');
+            click();
             clock.tick(LOAD_DELAY);
 
             process.nextTick(() => {
@@ -117,7 +119,7 @@ describe('<PreloadLink>', () => {
                 />
             );
 
-            getPreloadLink().simulate('click');
+            click();
             clock.tick(LOAD_DELAY);
 
             process.nextTick(() => {
@@ -141,13 +143,12 @@ describe('<PreloadLink>', () => {
     describe('Configuration', () => {
         beforeEach(() => {
             createRouterWrapper(<PreloadLink to="page1" load={timeoutFn} />);
-            link = getPreloadLink();
         });
 
         it('Does not crash without configuration', (done) => {
             expect.assertions(1);
 
-            link.simulate('click');
+            click();
             clock.tick(LOAD_DELAY);
 
             process.nextTick(() => {
@@ -169,7 +170,7 @@ describe('<PreloadLink>', () => {
                 onNavigate: fn1,
             });
 
-            link.simulate('click');
+            click();
             clock.tick(LOAD_DELAY);
 
             process.nextTick(() => {
@@ -181,7 +182,6 @@ describe('<PreloadLink>', () => {
 
         it('Calls correct lifecycle hook on failed navigation', (done) => {
             createRouterWrapper(<PreloadLink to="page1" load={timeoutFnFail} />);
-            link = getPreloadLink();
 
             expect.assertions(2);
 
@@ -194,7 +194,7 @@ describe('<PreloadLink>', () => {
                 onFail: fn2,
             });
 
-            link.simulate('click');
+            click();
             clock.tick(LOAD_DELAY);
 
             process.nextTick(() => {
@@ -207,7 +207,6 @@ describe('<PreloadLink>', () => {
 
         it('Calls onNavigate after navigation', (done) => {
             createRouterWrapper(<PreloadLink to="page1" load={timeoutFn} />);
-            link = getPreloadLink();
             const fn = sinon.spy();
 
             expect.assertions(2);
@@ -216,7 +215,7 @@ describe('<PreloadLink>', () => {
                 onNavigate: fn,
             });
 
-            link.simulate('click');
+            click();
             clock.tick(LOAD_DELAY);
 
             process.nextTick(() => {
@@ -230,7 +229,7 @@ describe('<PreloadLink>', () => {
     describe('Navigating', () => {
         it('Directly navigates to "page1" after a click without load function', () => {
             createRouterWrapper(<PreloadLink to="page1" />);
-            getPreloadLink().simulate('click');
+            click();
 
             expect(getPathname()).toEqual('/page1');
         });
@@ -240,7 +239,7 @@ describe('<PreloadLink>', () => {
 
             createRouterWrapper(<PreloadLink to="page1" load={timeoutFn} />);
 
-            getPreloadLink().simulate('click');
+            click();
 
             expect(getPathname()).toEqual('/');
 
@@ -284,7 +283,7 @@ describe('<PreloadLink>', () => {
 
             createRouterWrapper(<PreloadLink to="page1" load={[timeoutFn, timeoutFn]} />);
 
-            getPreloadLink().simulate('click');
+            click();
 
             expect(getPathname()).not.toEqual('/page1');
 
@@ -306,7 +305,7 @@ describe('<PreloadLink>', () => {
 
             createRouterWrapper(<PreloadLink to="page1" load={[timeoutFn, timeoutFnFail]} />);
 
-            getPreloadLink().simulate('click');
+            click();
 
             clock.tick(LOAD_DELAY);
 
@@ -327,7 +326,7 @@ describe('<PreloadLink>', () => {
 
             createRouterWrapper(<PreloadLink to="page1" load={loadFn} loadMiddleware={loadMiddleware} />);
 
-            getPreloadLink().simulate('click');
+            click();
         });
     });
 });
