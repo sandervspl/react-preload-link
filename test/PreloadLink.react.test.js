@@ -112,13 +112,14 @@ describe('<PreloadLink>', () => {
                 onLoading: fn1,
                 onSuccess: fn1,
                 onFail: fn2,
+                onNavigate: fn1,
             });
 
             link.simulate('click');
             clock.tick(LOAD_DELAY);
 
             process.nextTick(() => {
-                expect(fn1.calledTwice).toBe(true);
+                expect(fn1.calledThrice).toBe(true);
                 expect(fn2.notCalled).toBe(true);
                 done();
             });
@@ -146,6 +147,27 @@ describe('<PreloadLink>', () => {
                 expect(fn1.calledOnce).toBe(true);
                 expect(fn2.calledOnce).toBe(true);
 
+                done();
+            });
+        });
+
+        it('Calls onNavigate after navigation', (done) => {
+            createRouterWrapper(<PreloadLink to="page1" load={timeoutFn} />);
+            link = getPreloadLink();
+            const fn = sinon.spy();
+
+            expect.assertions(2);
+
+            pll.configure({
+                onNavigate: fn,
+            });
+
+            link.simulate('click');
+            clock.tick(LOAD_DELAY);
+
+            process.nextTick(() => {
+                expect(fn.called).toBe(true);
+                expect(getPathname()).toEqual('/page1');
                 done();
             });
         });
