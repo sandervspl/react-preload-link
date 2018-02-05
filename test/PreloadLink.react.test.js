@@ -36,7 +36,7 @@ describe('<PreloadLink>', () => {
 
     const timeoutFn = () => new Promise((resolve) => setTimeout(() => {
         resolves.push(true);
-        resolve();
+        resolve(1);
     }, LOAD_DELAY));
 
     const timeoutFnFail = () => new Promise((_, reject) => (
@@ -244,15 +244,16 @@ describe('<PreloadLink>', () => {
 
         it('Returns correct data from loadMiddleware', (done) => {
             expect.assertions(1);
+
             const loadFn = () => new Promise((resolve) => resolve(10));
             const loadMiddleware = (data) => {
                 expect(data).toEqual(10);
                 done();
-            }
+            };
 
             createRouterWrapper(<PreloadLink to="page1" load={loadFn} loadMiddleware={loadMiddleware} />);
 
-            clock.tick(10);
+            getPreloadLink().simulate('click');
         });
     });
 });
