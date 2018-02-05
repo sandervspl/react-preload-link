@@ -108,8 +108,10 @@ class PreloadLink extends React.Component {
             this.props[state](hook);
             setLoadState(fn);
         } else {
-            setLoadState(hook);
-            fn();
+            setLoadState(() => {
+                hook();
+                fn();
+            });
         }
     }
 

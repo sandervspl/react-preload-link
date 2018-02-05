@@ -272,9 +272,17 @@ var PreloadLink$1 = function (_React$Component) {
                 history = _this$props.history,
                 to = _this$props.to;
 
+            var hook = function hook() {
+                return _this.executeHook(ON_NAVIGATE);
+            };
 
             history.push(to);
-            _this.executeHook(ON_NAVIGATE);
+
+            if (_this.props[ON_NAVIGATE]) {
+                _this.props[ON_NAVIGATE](hook);
+            } else {
+                hook();
+            }
         };
 
         _this.executeHook = function (state) {
@@ -294,21 +302,22 @@ var PreloadLink$1 = function (_React$Component) {
 
             var setLoadState = state === ON_LOADING ? _this.setLoading : _this.setLoaded;
             var hook = function hook() {
-                _this.executeHook(state);
-                fn();
+                return _this.executeHook(state);
             };
 
             if (_this.props[state]) {
-                setLoadState();
                 _this.props[state](hook);
+                setLoadState(fn);
             } else {
-                setLoadState(hook);
+                setLoadState(function () {
+                    hook();
+                    fn();
+                });
             }
         };
 
         _this.unwrapWithMiddleware = function (fn) {
             return fn().then(function (data) {
-                // console.log(data);
                 _this.props.loadMiddleware(data);
             });
         };
@@ -354,9 +363,13 @@ var PreloadLink$1 = function (_React$Component) {
 
         _this.handleClick = function (e) {
             var process = PreloadLink.process;
+            var onClick = _this.props.onClick;
+
             // prevents navigation
 
             e.preventDefault();
+
+            onClick();
 
             // prevent navigation if we can't override a load with a new click
             if (process.busy && !process.canCancel) return;
@@ -447,20 +460,24 @@ PreloadLink$1.propTypes = {
     onLoading: PT.func,
     onSuccess: PT.func,
     onFail: PT.func,
+    onNavigate: PT.func,
     noInterrupt: PT.bool,
     loadMiddleware: PT.func,
     className: PT.string,
     navLink: PT.bool,
-    activeClassName: PT.string
+    activeClassName: PT.string,
+    onClick: PT.func
 };
 
 PreloadLink$1.defaultProps = {
     onLoading: null,
     onSuccess: null,
     onFail: null,
+    onNavigate: null,
     noInterrupt: false,
     loadMiddleware: noop,
-    navLink: false
+    navLink: false,
+    onClick: noop
 };
 
 // component initialization function

@@ -108,10 +108,6 @@ class Home extends React.Component {
                             <p>Link</p>
                         </PreloadLink>
 
-                        <PreloadLink to="/" navLink activeClassName="active-link">
-                            <p>NavLink</p>
-                        </PreloadLink>
-
                         <PreloadLink
                             to="page2"
                             load={fn}
