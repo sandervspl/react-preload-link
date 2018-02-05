@@ -75,9 +75,15 @@ class PreloadLink extends React.Component {
     // navigate with react-router to new URL
     navigate = () => {
         const { history, to } = this.props;
+        const hook = () => this.executeHook(c.ON_NAVIGATE);
 
         history.push(to);
-        this.executeHook(c.ON_NAVIGATE);
+
+        if (this.props[c.ON_NAVIGATE]) {
+            this.props[c.ON_NAVIGATE](hook);
+        } else {
+            hook();
+        }
     }
 
     // NOTE: it's best to use prepareHookCall if you want to execute hooks,
@@ -96,22 +102,19 @@ class PreloadLink extends React.Component {
 
     prepareHookCall = (state, fn = noop) => {
         const setLoadState = state === c.ON_LOADING ? this.setLoading : this.setLoaded;
-        const hook = () => {
-            this.executeHook(state);
-            fn();
-        };
+        const hook = () => this.executeHook(state);
 
         if (this.props[state]) {
-            setLoadState();
             this.props[state](hook);
+            setLoadState(fn);
         } else {
             setLoadState(hook);
+            fn();
         }
     }
 
     unwrapWithMiddleware = (fn) => (
         fn().then((data) => {
-            // console.log(data);
             this.props.loadMiddleware(data);
         })
     )
@@ -210,6 +213,7 @@ PreloadLink.propTypes = {
     onLoading: PT.func,
     onSuccess: PT.func,
     onFail: PT.func,
+    onNavigate: PT.func,
     noInterrupt: PT.bool,
     loadMiddleware: PT.func,
     className: PT.string,
@@ -222,6 +226,7 @@ PreloadLink.defaultProps = {
     onLoading: null,
     onSuccess: null,
     onFail: null,
+    onNavigate: null,
     noInterrupt: false,
     loadMiddleware: noop,
     navLink: false,

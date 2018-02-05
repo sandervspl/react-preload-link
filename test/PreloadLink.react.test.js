@@ -6,7 +6,7 @@ import { mount, configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import sinon from 'sinon';
 
-import PreloadLink, * as pll from 'react-preload-link';
+import PreloadLink, * as rpl from '../src';
 import Root from '../examples/src/Root';
 import { PRELOAD_FAIL } from 'react-preload-link';
 
@@ -60,7 +60,7 @@ describe('<PreloadLink>', () => {
     };
 
     beforeEach(() => {
-        pll.configure({});
+        rpl.configure({});
         resolves = [];
         clock = sinon.useFakeTimers();
     });
@@ -82,6 +82,59 @@ describe('<PreloadLink>', () => {
         it('Prop "noInterrupt" default value is "false"', () => {
             expect(PreloadLink.WrappedComponent.defaultProps.noInterrupt).toEqual(false);
         });
+
+        it('Calls onLoading/onSuccess/onNavigate prop callback functions', (done) => {
+            expect.assertions(1);
+
+            const fn = sinon.spy();
+
+            createRouterWrapper(
+                <PreloadLink
+                    to="page1"
+                    load={timeoutFn}
+                    onLoading={fn}
+                    onSuccess={fn}
+                    onNavigate={fn}
+                />
+            );
+
+            getPreloadLink().simulate('click');
+            clock.tick(LOAD_DELAY);
+
+            process.nextTick(() => {
+                expect(fn.callCount).toEqual(3);
+                done();
+            });
+        });
+
+        it('Calls onLoading/onFail prop callback functions', (done) => {
+            expect.assertions(1);
+
+            const fn = sinon.spy();
+
+            createRouterWrapper(
+                <PreloadLink
+                    to="page1"
+                    load={timeoutFnFail}
+                    onLoading={fn}
+                    onFail={fn}
+                />
+            );
+
+            getPreloadLink().simulate('click');
+            clock.tick(LOAD_DELAY);
+
+            process.nextTick(() => {
+                expect(fn.callCount).toEqual(2);
+                done();
+            });
+        });
+
+        // TODO
+        it('Receives activeClassName as NavLink on current route');
+
+        // TODO
+        it('');
     });
 
     describe('Configuration', () => {
@@ -108,7 +161,7 @@ describe('<PreloadLink>', () => {
             const fn1 = sinon.spy();
             const fn2 = sinon.spy();
 
-            pll.configure({
+            rpl.configure({
                 onLoading: fn1,
                 onSuccess: fn1,
                 onFail: fn2,
@@ -134,7 +187,7 @@ describe('<PreloadLink>', () => {
             const fn1 = sinon.spy();
             const fn2 = sinon.spy();
 
-            pll.configure({
+            rpl.configure({
                 onLoading: fn1,
                 onSuccess: fn1,
                 onFail: fn2,
@@ -158,7 +211,7 @@ describe('<PreloadLink>', () => {
 
             expect.assertions(2);
 
-            pll.configure({
+            rpl.configure({
                 onNavigate: fn,
             });
 
@@ -244,7 +297,7 @@ describe('<PreloadLink>', () => {
         });
 
         it('Safely fails when a Promise from an array rejects with PRELOAD_FAIL', (done) => {
-            pll.configure({
+            rpl.configure({
                 onFail: () => {
                     done();
                 },
@@ -270,11 +323,5 @@ describe('<PreloadLink>', () => {
 
             getPreloadLink().simulate('click');
         });
-
-        // TODO
-        it('Calls prop callback function if it exists');
-
-        // TODO
-        it('Receives activeClassName as NavLink on current route');
     });
 });
