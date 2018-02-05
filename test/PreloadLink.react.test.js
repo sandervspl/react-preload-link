@@ -51,7 +51,7 @@ describe('<PreloadLink>', () => {
         wrapper.instance().history.location.pathname
     );
 
-    const createRouterWrapper = (Component, props) => {
+    const mountWithRouter = (Component, props) => {
         wrapper = mount(
             <Router {...props}>
                 {Component}
@@ -73,7 +73,7 @@ describe('<PreloadLink>', () => {
 
     describe('Props', () => {
         it('Renders a <PreloadLink> component', () => {
-            createRouterWrapper(<PreloadLink to="page1" />);
+            mountWithRouter(<PreloadLink to="page1" />);
             expect(getPreloadLink().length).toEqual(1);
         });
 
@@ -86,7 +86,7 @@ describe('<PreloadLink>', () => {
 
             const fn = sinon.spy();
 
-            createRouterWrapper(
+            mountWithRouter(
                 <PreloadLink
                     to="page1"
                     load={timeoutFn}
@@ -110,7 +110,7 @@ describe('<PreloadLink>', () => {
 
             const fn = sinon.spy();
 
-            createRouterWrapper(
+            mountWithRouter(
                 <PreloadLink
                     to="page1"
                     load={timeoutFnFail}
@@ -129,19 +129,37 @@ describe('<PreloadLink>', () => {
         });
 
         it('Has no activeClassName as NavLink on different route', () => {
-            createRouterWrapper(<PreloadLink to="/page1" navLink activeClassName="active" />);
-            expect(getPreloadLink().hasClass('active')).toBe(false);
+            mountWithRouter(
+                <PreloadLink
+                    to="/page1"
+                    navLink
+                    activeClassName="active"
+                />
+            );
+
+            expect(getPreloadLink()
+                .hasClass('active'))
+                .toBe(false);
         });
 
-        // FIXME: active class not working in test but works in production
-        it('Has the activeClassName as NavLink on active route'/*, () => {
-            createRouterWrapper(<PreloadLink to="/" navLink activeClassName="active" />);
-            expect(getPreloadLink().hasClass('active')).toBe(true);
-        }*/);
+        it('Has the activeClassName as NavLink on active route', () => {
+            mountWithRouter(
+                <PreloadLink
+                    to="/"
+                    navLink
+                    activeClassName="active"
+                />
+            );
+
+            expect(getPreloadLink()
+                .render()
+                .hasClass('active'))
+                .toBe(true);
+        });
 
         it('Calls onClick function', () => {
             const fn = sinon.spy();
-            createRouterWrapper(<PreloadLink to="/page1" onClick={fn} />);
+            mountWithRouter(<PreloadLink to="/page1" onClick={fn} />);
 
             click();
 
@@ -151,7 +169,7 @@ describe('<PreloadLink>', () => {
 
     describe('Configuration', () => {
         beforeEach(() => {
-            createRouterWrapper(<PreloadLink to="page1" load={timeoutFn} />);
+            mountWithRouter(<PreloadLink to="page1" load={timeoutFn} />);
         });
 
         it('Does not crash without configuration', (done) => {
@@ -190,7 +208,7 @@ describe('<PreloadLink>', () => {
         });
 
         it('Calls correct lifecycle hook on failed navigation', (done) => {
-            createRouterWrapper(<PreloadLink to="page1" load={timeoutFnFail} />);
+            mountWithRouter(<PreloadLink to="page1" load={timeoutFnFail} />);
 
             expect.assertions(2);
 
@@ -215,7 +233,7 @@ describe('<PreloadLink>', () => {
         });
 
         it('Calls onNavigate after navigation', (done) => {
-            createRouterWrapper(<PreloadLink to="page1" load={timeoutFn} />);
+            mountWithRouter(<PreloadLink to="page1" load={timeoutFn} />);
             const fn = sinon.spy();
 
             expect.assertions(2);
@@ -237,7 +255,7 @@ describe('<PreloadLink>', () => {
 
     describe('Navigating', () => {
         it('Directly navigates to "page1" after a click without load function', () => {
-            createRouterWrapper(<PreloadLink to="page1" />);
+            mountWithRouter(<PreloadLink to="page1" />);
             click();
 
             expect(getPathname()).toEqual('/page1');
@@ -246,11 +264,11 @@ describe('<PreloadLink>', () => {
         it(`Navigates to "/page1" after ${LOAD_DELAY}ms with timeout function`, (done) => {
             expect.assertions(2);
 
-            createRouterWrapper(<PreloadLink to="page1" load={timeoutFn} />);
+            mountWithRouter(<PreloadLink to="page1" load={timeoutFn} />);
 
             click();
 
-            expect(getPathname()).toEqual('/');
+            expect(getPathname()).not.toEqual('/page1');
 
             clock.tick(LOAD_DELAY);
 
@@ -261,10 +279,10 @@ describe('<PreloadLink>', () => {
         });
 
         it('Is impossible to interrupt an uninterruptable link', (done) => {
-            expect.assertions(4);
+            expect.assertions(6);
 
             const loadCb = sinon.spy();
-            createRouterWrapper(
+            mountWithRouter(
                 <Fragment>
                     <PreloadLink to="page1" noInterrupt load={timeoutFn} />
                     <PreloadLink to="page2" load={loadCb} />
@@ -275,13 +293,16 @@ describe('<PreloadLink>', () => {
 
             link.at(0).simulate('click'); // with noInterrupt
             link.at(1).simulate('click'); // without
-            clock.tick(LOAD_DELAY);
 
             expect(PreloadLinkObj.process.busy).toBe(true);
             expect(PreloadLinkObj.process.canCancel).toBe(false);
             expect(loadCb.notCalled).toBe(true);
 
+            clock.tick(LOAD_DELAY);
+
             process.nextTick(() => {
+                expect(PreloadLinkObj.process.busy).toBe(false);
+                expect(PreloadLinkObj.process.canCancel).toBe(true);
                 expect(getPathname()).toEqual('/page1');
                 done();
             });
@@ -290,7 +311,7 @@ describe('<PreloadLink>', () => {
         it('Waits for all load Promises to resolve before navigating', (done) => {
             expect.assertions(3);
 
-            createRouterWrapper(<PreloadLink to="page1" load={[timeoutFn, timeoutFn]} />);
+            mountWithRouter(<PreloadLink to="page1" load={[timeoutFn, timeoutFn]} />);
 
             click();
 
@@ -312,7 +333,7 @@ describe('<PreloadLink>', () => {
                 onFail: fn,
             });
 
-            createRouterWrapper(<PreloadLink to="page1" load={[timeoutFn, timeoutFnFail]} />);
+            mountWithRouter(<PreloadLink to="page1" load={[timeoutFn, timeoutFnFail]} />);
 
             click();
 
@@ -333,7 +354,13 @@ describe('<PreloadLink>', () => {
                 done();
             };
 
-            createRouterWrapper(<PreloadLink to="page1" load={loadFn} loadMiddleware={loadMiddleware} />);
+            mountWithRouter(
+                <PreloadLink
+                    to="page1"
+                    load={loadFn}
+                    loadMiddleware={loadMiddleware}
+                />
+            );
 
             click();
         });
