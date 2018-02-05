@@ -1,13 +1,11 @@
 /* eslint-disable no-undef */
 import React, { Fragment } from 'react';
-import ReactDOM from 'react-dom';
 import { MemoryRouter as Router } from 'react-router-dom';
 import { mount, configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import sinon from 'sinon';
 
 import PreloadLink, * as rpl from 'react-preload-link';
-import Root from '../examples/src/Root';
 import { PRELOAD_FAIL } from 'react-preload-link';
 
 // configure enzyme
