@@ -298,10 +298,10 @@ describe('<PreloadLink>', () => {
         });
 
         it('Safely fails when a Promise from an array rejects with PRELOAD_FAIL', (done) => {
+            const fn = sinon.spy();
+
             rpl.configure({
-                onFail: () => {
-                    done();
-                },
+                onFail: fn,
             });
 
             createRouterWrapper(<PreloadLink to="page1" load={[timeoutFn, timeoutFnFail]} />);
@@ -309,6 +309,11 @@ describe('<PreloadLink>', () => {
             getPreloadLink().simulate('click');
 
             clock.tick(LOAD_DELAY);
+
+            process.nextTick(() => {
+                expect(fn.calledOnce).toBe(true);
+                done();
+            });
         });
 
         it('Returns correct data from loadMiddleware', (done) => {
