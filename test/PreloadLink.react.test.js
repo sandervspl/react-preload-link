@@ -270,5 +270,8 @@ describe('<PreloadLink>', () => {
 
             getPreloadLink().simulate('click');
         });
+
+        // TODO
+        it('Calls prop callback function if it exists');
     });
 });

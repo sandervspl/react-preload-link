@@ -54,7 +54,7 @@ class PreloadLink extends React.Component {
             busy: true,
         };
 
-        this.setState({ loading: true }, () => callback());
+        this.setState({ loading: true }, callback);
     }
 
     setLoaded = (callback = noop) => {
@@ -69,7 +69,7 @@ class PreloadLink extends React.Component {
             busy: false,
         };
 
-        this.setState({ loading: false }, () => callback());
+        this.setState({ loading: false }, callback);
     }
 
     // navigate with react-router to new URL
@@ -109,9 +109,12 @@ class PreloadLink extends React.Component {
         }
     }
 
-    unwrapWithMiddleware = (fn) => {
-        return fn().then((data) => this.props.loadMiddleware(data));
-    }
+    unwrapWithMiddleware = (fn) => (
+        fn().then((data) => {
+            // console.log(data);
+            this.props.loadMiddleware(data);
+        })
+    )
 
     // prepares the page transition. Wait on all promises to resolve before changing route.
     prepareNavigation = () => {

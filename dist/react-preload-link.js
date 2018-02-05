@@ -248,9 +248,7 @@ var PreloadLink$1 = function (_React$Component) {
                 busy: true
             });
 
-            _this.setState({ loading: true }, function () {
-                return callback();
-            });
+            _this.setState({ loading: true }, callback);
         };
 
         _this.setLoaded = function () {
@@ -266,9 +264,7 @@ var PreloadLink$1 = function (_React$Component) {
                 busy: false
             });
 
-            _this.setState({ loading: false }, function () {
-                return callback();
-            });
+            _this.setState({ loading: false }, callback);
         };
 
         _this.navigate = function () {
@@ -310,6 +306,13 @@ var PreloadLink$1 = function (_React$Component) {
             }
         };
 
+        _this.unwrapWithMiddleware = function (fn) {
+            return fn().then(function (data) {
+                // console.log(data);
+                _this.props.loadMiddleware(data);
+            });
+        };
+
         _this.prepareNavigation = function () {
             var process = PreloadLink.process;
             var load = _this.props.load;
@@ -320,11 +323,11 @@ var PreloadLink$1 = function (_React$Component) {
             // create functions of our load props
             if (isArray) {
                 var loadList = load.map(function (fn) {
-                    return fn();
+                    return _this.unwrapWithMiddleware(fn);
                 });
                 toLoad = Promise.all(loadList);
             } else {
-                toLoad = load();
+                toLoad = _this.unwrapWithMiddleware(load);
             }
 
             // wait for all async functions to resolve
@@ -432,14 +435,16 @@ PreloadLink$1.propTypes = {
     onLoading: PT.func,
     onSuccess: PT.func,
     onFail: PT.func,
-    noInterrupt: PT.bool
+    noInterrupt: PT.bool,
+    loadMiddleware: PT.func
 };
 
 PreloadLink$1.defaultProps = {
     onLoading: null,
     onSuccess: null,
     onFail: null,
-    noInterrupt: false
+    noInterrupt: false,
+    loadMiddleware: noop
 };
 
 // component initialization function
