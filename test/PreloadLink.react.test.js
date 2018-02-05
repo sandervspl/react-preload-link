@@ -19,7 +19,6 @@ const LOAD_DELAY = 100;
 
 describe('<PreloadLink>', () => {
     let wrapper;
-    let link;
     let clock;
     let resolves;
 
@@ -345,10 +344,8 @@ describe('<PreloadLink>', () => {
                 </Fragment>
             )
 
-            link = getPreloadLink();
-
-            link.at(0).simulate('click'); // with noInterrupt
-            link.at(1).simulate('click'); // without
+            getPreloadLink().at(0).simulate('click'); // with noInterrupt
+            getPreloadLink().at(1).simulate('click'); // without
 
             expect(PreloadLinkObj.process.busy).toBe(true);
             expect(PreloadLinkObj.process.canCancel).toBe(false);
@@ -420,7 +417,51 @@ describe('<PreloadLink>', () => {
 
             click();
         });
+    });
 
-        it('Stops onClick')
+    describe('PreloadLink process', () => {
+        it('Stops onClick if process is busy and can\'t cancel', () => {
+            PreloadLinkObj.process.busy = true;
+            PreloadLinkObj.process.canCancel = false;
+
+            mountWithRouter(
+                <PreloadLink to="page1" />
+            );
+
+            click();
+
+            expect(getPathname()).toEqual('/');
+        });
+
+        it('Correctly sets process cancelUid', () => {
+            let uid;
+
+            mountWithRouter(
+                <Fragment>
+                    <PreloadLink to="page1" load={timeoutFn} />
+                    <PreloadLink to="page2" load={timeoutFn} />
+                </Fragment>
+            );
+
+            getPreloadLink().at(0).simulate('click');
+            uid = PreloadLinkObj.process.uid;
+            getPreloadLink().at(1).simulate('click');
+
+            expect(PreloadLinkObj.process.cancelUid).toEqual(uid);
+        });
+
+        it('Correctly sets process canCancel to false', () => {
+            mountWithRouter(
+                <PreloadLink
+                    to="page2"
+                    load={timeoutFn}
+                    noInterrupt
+                />
+            );
+
+            click();
+
+            expect(PreloadLinkObj.process.canCancel).toBe(false);
+        });
     });
 });
