@@ -215,6 +215,28 @@ describe('<PreloadLink>', () => {
                 .toBe(true);
         });
 
+        it('Has the activeClassName as NavLink after navigating to route', () => {
+            mountWithRouter(
+                <PreloadLink
+                    to="/page"
+                    navLink
+                    activeClassName="active"
+                />
+            );
+
+            expect(getPreloadLink()
+                .render()
+                .hasClass('active'))
+                .toBe(false);
+
+            click();
+
+            expect(getPreloadLink()
+                .render()
+                .hasClass('active'))
+                .toBe(true);
+        });
+
         it('Calls onClick function', () => {
             const fn = sinon.spy();
             mountWithRouter(<PreloadLink to="/page1" onClick={fn} />);
