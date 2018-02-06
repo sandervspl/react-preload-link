@@ -21,7 +21,6 @@ var ON_LOADING = 'onLoading';
 var ON_SUCCESS = 'onSuccess';
 var ON_FAIL = 'onFail';
 var ON_NAVIGATE = 'onNavigate';
-var PRELOAD_FAIL$1 = 'preloadLink/fail';
 
 var asyncGenerator = function () {
   function AwaitValue(value) {
@@ -220,8 +219,6 @@ var possibleConstructorReturn = function (self, call) {
   return call && (typeof call === "object" || typeof call === "function") ? call : self;
 };
 
-// let Preload Link know the fetch failed with this constant
-var PRELOAD_FAIL = PRELOAD_FAIL$1;
 var PreloadLink$1 = function (_React$Component) {
     inherits(PreloadLink, _React$Component);
 
@@ -346,19 +343,13 @@ var PreloadLink$1 = function (_React$Component) {
             // wait for all async functions to resolve
             // set in- and external loading states and proceed to navigation if successful
             // TODO: give error if function does not return a promise with explanation
-            toLoad.then(function (result) {
+            toLoad.then(function () {
                 // do not perform further navigation if this was ordered for cancel
                 if (process.cancelUid === _this.uid) {
                     return;
                 }
 
-                var preloadFailed = isArray ? result.includes(PRELOAD_FAIL) : result === PRELOAD_FAIL;
-
-                if (preloadFailed) {
-                    _this.prepareHookCall(ON_FAIL);
-                } else {
-                    _this.prepareHookCall(ON_SUCCESS, _this.navigate);
-                }
+                _this.prepareHookCall(ON_SUCCESS, _this.navigate);
             }).catch(function () {
                 // loading failed. Set in- and external states to reflect this
                 _this.prepareHookCall(ON_FAIL);
@@ -489,7 +480,6 @@ var configure = PreloadLink$1.init;
 // component
 var PreloadLink$2 = reactRouterDom.withRouter(PreloadLink$1);
 
-PreloadLink$2.PRELOAD_FAIL = PRELOAD_FAIL$1;
 PreloadLink$2.configure = configure;
 
 return PreloadLink$2;

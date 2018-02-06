@@ -63,8 +63,5 @@ export const getSwapiPerson = (id) => (dispatch) => {
     return window.fetch(`https://swapi.co/api/people/${id}`)
         .then(response => response.json())
         .then(data => dispatch(setSuccess(data)))
-        .catch(() => {
-            dispatch(setFailed());
-            return PRELOAD_FAIL; // let Preload Link know the fetch failed.
-        });
+        .catch(() => dispatch(setFailed()));
 };

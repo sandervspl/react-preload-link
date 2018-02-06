@@ -21,16 +21,15 @@ declare module 'react-preload-link' {
         onSuccess?: PreloadLinkLifecycleHook,
         onFail?: PreloadLinkLifecycleHook,
         onNavigate?: PreloadLinkLifecycleHook,
+        loadMiddleware?: (data: any) => any,
         noInterrupt?: boolean,
-        className: string,
-        navLink: boolean,
-        activeClassName: string,
-        onClick: () => any,
+        className?: string,
+        navLink?: boolean,
+        activeClassName?: string,
+        onClick?: () => any,
     }
 
     export default class PreloadLink extends React.Component<PreloadLinkProps, any> {}
 
     export const configure: PreloadLinkConfig;
-
-    export const PRELOAD_FAIL: string;
 }

@@ -4,9 +4,6 @@ import { withRouter, Link, NavLink } from 'react-router-dom';
 import { uuid, noop } from './helpers';
 import * as c from './constants';
 
-// let Preload Link know the fetch failed with this constant
-export const { PRELOAD_FAIL } = c;
-
 class PreloadLink extends React.Component {
     static [c.ON_LOADING];
     static [c.ON_SUCCESS];
@@ -144,21 +141,13 @@ class PreloadLink extends React.Component {
         // set in- and external loading states and proceed to navigation if successful
         // TODO: give error if function does not return a promise with explanation
         toLoad
-            .then((result) => {
+            .then(() => {
                 // do not perform further navigation if this was ordered for cancel
                 if (process.cancelUid === this.uid) {
                     return;
                 }
 
-                const preloadFailed = isArray
-                    ? result.includes(PRELOAD_FAIL)
-                    : result === PRELOAD_FAIL;
-
-                if (preloadFailed) {
-                    this.prepareHookCall(c.ON_FAIL);
-                } else {
-                    this.prepareHookCall(c.ON_SUCCESS, this.navigate);
-                }
+                this.prepareHookCall(c.ON_SUCCESS, this.navigate);
             })
             .catch(() => {
                 // loading failed. Set in- and external states to reflect this
