@@ -306,8 +306,12 @@ var PreloadLink$1 = function (_React$Component) {
             };
 
             if (_this.props[state]) {
-                _this.props[state](hook);
-                setLoadState(fn);
+                if (typeof _this.props[state] !== 'function') {
+                    console.error('PreloadLink: Method for lifecycle \'' + state + '\' is not a function.');
+                } else {
+                    _this.props[state](hook);
+                    setLoadState(fn);
+                }
             } else {
                 setLoadState(function () {
                     hook();

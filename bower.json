@@ -4,7 +4,7 @@
         "dist/react-preload-link.min.js",
         "dist/react-preload-link.min.css"
     ],
-    "version": "0.1.9",
+    "version": "0.1.10",
     "homepage": "https://github.com/sandervspl/react-preload-link",
     "authors": [
         "Sander Vispoel"
