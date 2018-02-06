@@ -105,8 +105,12 @@ class PreloadLink extends React.Component {
         const hook = () => this.executeHook(state);
 
         if (this.props[state]) {
-            this.props[state](hook);
-            setLoadState(fn);
+            if (typeof this.props[state] !== 'function') {
+                console.error(`PreloadLink: Method for lifecycle '${state}' is not a function.`);
+            } else {
+                this.props[state](hook);
+                setLoadState(fn);
+            }
         } else {
             setLoadState(() => {
                 hook();

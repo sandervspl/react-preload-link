@@ -55,10 +55,13 @@ describe('<PreloadLink>', () => {
         rpl.configure({});
         resolves = [];
         clock = sinon.useFakeTimers();
+
+        console.error = jest.fn();
     });
 
     afterEach(() => {
         clock.restore();
+        console.error.mockClear();
     });
 
     it('Renders a <PreloadLink> component', () => {
@@ -220,6 +223,13 @@ describe('<PreloadLink>', () => {
 
             expect(fn.calledOnce).toBe(true);
         });
+
+        it('Logs an error when a hook is not a function', () => {
+            mountWithRouter(<PreloadLink to="/page1" load={timeoutFn} onLoading={1} />);
+            click();
+            clock.tick(LOAD_DELAY);
+            expect(console.error).toHaveBeenCalled();
+        });
     });
 
     describe('Configuration', () => {
@@ -305,6 +315,16 @@ describe('<PreloadLink>', () => {
                 expect(getPathname()).toEqual('/page1');
                 done();
             });
+        });
+
+        it('Logs an error when a hook is not a function', () => {
+            rpl.configure({
+                onLoading: 1,
+            });
+            mountWithRouter(<PreloadLink to="/page1" load={timeoutFn} />);
+            click();
+            clock.tick(LOAD_DELAY);
+            expect(console.error).toHaveBeenCalled();
         });
     });
 
