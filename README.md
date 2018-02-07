@@ -1,4 +1,7 @@
 # react-preload-link
+
+[![npm version](https://img.shields.io/npm/v/react-preload-link.svg)](https://www.npmjs.com/package/react-preload-link)
+
 A superversion of [React Router's](https://github.com/ReactTraining/react-router) Link component that preloads your data before navigating. Built with and for [React](http://facebook.github.io/react/index.html).
 
 **This component is NOT ready for production yet! When it hits version 1.0.0 it should be ready for production.**
@@ -61,25 +64,25 @@ PreloadLinkProps {
 }
 ```
 
-### to - Required
+### to (Required)
 Type: `string`
 
-The URL to which the component will navigate to after load. The only required prop.
+The URL to which the app will navigate to. If `load` is used, it will navigate after the `load` function(s) resolve. The only required prop.
 
 ### load
-Type: `(() => Promise<any> | () => Promise<any>[])`
+Type: `() => Promise<any> | (() => Promise<any>)[]`
 
-Promise that will be resolved before navigating to the URL provided by `to`. This can be a single Promise or multiple in an Array. It will wait for everything to resolve before navigating.
+Promise that will be resolved before navigating to the URL provided by `to`. This can be a single function or multiple in an Array. **Must be a function that returns a Promise!** It will wait for everything to resolve before navigating.
 
 **Note**: If you see an error that says "Can not read then of undefined" then one of your passed functions does not return a Promise.
 
 ### onLoading, onSuccess, onFail, onNavigate
-Type: `(defaultHook: () => void) => any`
+Type: `(defaultHook: () => void) => void`
 
 Overriding the default hooks, set with `configure`, can be done with these props. The default hook is passed as a parameter.
 
 ### loadMiddleware
-Type: `(data: any) => any`
+Type: `(data: any) => void`
 
 Will fire for each of your resolved Promises. The resolved data is passed as a parameter.
 
@@ -110,7 +113,7 @@ Type: `string`
 CSS class to be set on the `<a>` element when its route is active.
 
 ### onClick
-Type: `() => any`
+Type: `() => void`
 
 For any methods that should be fired instantly on click. Use this for methods that are not async.
 
