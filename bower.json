@@ -3,7 +3,7 @@
     "main": [
         "dist/react-preload-link.js"
     ],
-    "version": "0.1.11",
+    "version": "0.1.12",
     "homepage": "https://github.com/sandervspl/react-preload-link",
     "authors": [
         "Sander Vispoel <contact@sandervispoel.com> (https://sandervispoel.com)"
