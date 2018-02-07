@@ -32,14 +32,22 @@ import PreloadLink from 'react-preload-link';
 const PreloadExample = () => {
     const loadProfile = () => {
         return fetch('https://someapi.com/api/v1/user/me')
-            .then(result => result.json())
-            .then(data => doSomethingWithData(data));
+            .then(result => doSomething(result));
     };
+    
+    const loadFriends = () => {
+        return fetch('https://someapi.com/api/v1/user/1/friends')
+            .then(result => doSomething(result));
+    }
     
     return (
         <div>
             <PreloadLink to="profile" load={loadProfile}>
                 View profile
+            </PreloadLink>
+            
+            <PreloadLink to="friends" load={[loadProfile, loadFriends]}>
+                View friends
             </PreloadLink>
         </div>
     );
@@ -50,7 +58,7 @@ const PreloadExample = () => {
 ```ts
 PreloadLinkProps {
     to: string,
-    load?: () => Promise<any> | () => Promise<any>[],
+    load?: () => Promise<any> | (() => Promise<any>)[],
     onLoading?: (defaultHook: () => void) => any,
     onSuccess?: (defaultHook: () => void) => any,
     onFail?: (defaultHook: () => void) => any,
