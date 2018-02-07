@@ -6,12 +6,38 @@
     "jsnext:main": "dist/react-preload-link.js",
     "module": "dist/react-preload-link.js",
     "types": "./index.d.ts",
-    "author": "Sander Vispoel",
+    "author": "Sander Vispoel <contact@sandervispoel.com> (https://sandervispoel.com)",
     "license": "MIT",
     "repository": {
         "type": "git",
         "url": "https://github.com/sandervspl/react-preload-link.git"
     },
+    "bugs": {
+        "url": "https://github.com/sandervspl/react-preload-link/issues"
+    },
+    "files": [
+        "dist",
+        "lib",
+        "index.d.ts"
+    ],
+    "keywords": [
+        "react",
+        "reactjs",
+        "react component",
+        "component",
+        "async",
+        "fetch",
+        "load",
+        "preload",
+        "ui",
+        "link",
+        "data",
+        "wait",
+        "navigate",
+        "router",
+        "routing",
+        "react-router"
+    ],
     "dependencies": {
         "sinon": "^4.2.2"
     },
@@ -88,22 +114,6 @@
         "test:watch": "npm test -- --watch",
         "test:cov": "npm test -- --coverage"
     },
-    "files": [
-        "dist",
-        "lib",
-        "index.d.ts"
-    ],
-    "keywords": [
-        "react",
-        "reactjs",
-        "react component",
-        "component",
-        "async",
-        "fetch",
-        "link",
-        "preload",
-        "ui"
-    ],
     "lint-staged": {
         "*.js": "eslint"
     }

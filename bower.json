@@ -1,13 +1,12 @@
 {
     "name": "react-preload-link",
     "main": [
-        "dist/react-preload-link.min.js",
-        "dist/react-preload-link.min.css"
+        "dist/react-preload-link.js"
     ],
     "version": "0.1.11",
     "homepage": "https://github.com/sandervspl/react-preload-link",
     "authors": [
-        "Sander Vispoel"
+        "Sander Vispoel <contact@sandervispoel.com> (https://sandervispoel.com)"
     ],
     "description": "A superversion of React Router's Link that preloads your data before navigating. Built with and for React.",
     "moduleType": [
@@ -23,9 +22,16 @@
         "component",
         "async",
         "fetch",
-        "link",
+        "load",
         "preload",
-        "ui"
+        "ui",
+        "link",
+        "data",
+        "wait",
+        "navigate",
+        "router",
+        "routing",
+        "react-router"
     ],
     "license": "MIT",
     "ignore": [
