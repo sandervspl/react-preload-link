@@ -30,3 +30,8 @@ yarn.lock
 # v2 ignores
 .NOTES.md
 .TODO.md
+
+# Output
+dist
+examples/dist
+lib
