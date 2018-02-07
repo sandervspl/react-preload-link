@@ -6,7 +6,6 @@ import Adapter from 'enzyme-adapter-react-16';
 import sinon from 'sinon';
 
 import PreloadLink, * as rpl from 'react-preload-link';
-import { PRELOAD_FAIL } from 'react-preload-link';
 
 // configure enzyme
 configure({ adapter: new Adapter() });
@@ -30,7 +29,7 @@ describe('<PreloadLink>', () => {
     }, LOAD_DELAY));
 
     const timeoutFnFail = () => new Promise((_, reject) => (
-        setTimeout(() => reject(PRELOAD_FAIL), LOAD_DELAY)
+        setTimeout(() => reject(), LOAD_DELAY)
     ));
 
     const getPreloadLink = () => (
@@ -421,7 +420,7 @@ describe('<PreloadLink>', () => {
             });
         });
 
-        it('Safely fails when a Promise from an array rejects with PRELOAD_FAIL', (done) => {
+        it('Safely fails when a Promise from an array rejects', (done) => {
             const fn = sinon.spy();
 
             rpl.configure({
