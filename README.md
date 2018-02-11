@@ -130,9 +130,10 @@ For any methods that should be fired instantly on click. Use this for methods th
 
 ## Configuring lifecycle hooks
 
-You can create hooks for the various lifecycle methods of PreloadLink. These functions will only be called if a `load` prop is passed to the component. These functions will only be called once, even if you pass an array to `load`. 
+You can create hooks for the various lifecycle methods of PreloadLink. These functions will only be called if a `load` prop is passed to the component. These functions will only be called once, even if you pass an array to `load`. It's recommended to only use `configure` once, like at the entry of your app.
 
-It's recommended to only use `configure` once, like at the entry of your app. You can hook up a global loader with these hooks very easily. Here is an example on how to use [NProgress](https://github.com/rstacruz/nprogress/) together with PreloadLink.
+### Example
+You can hook up a global loader with these hooks very easily. Here is an example on how to use [NProgress](https://github.com/rstacruz/nprogress/) together with PreloadLink.
 
 ```js
 import { configure } from 'react-preload-link';
