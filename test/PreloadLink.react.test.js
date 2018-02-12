@@ -1,12 +1,10 @@
 /* eslint-disable no-undef */
 import React, { Fragment } from 'react';
-import { MemoryRouter as Router, withRouter } from 'react-router-dom';
+import { MemoryRouter as Router } from 'react-router-dom';
 import { mount, configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import sinon from 'sinon';
-import * as ReactPL from 'react-preload-link';
-
-const PreloadLink = withRouter(ReactPL.PreloadLinkComponent);
+import PreloadLink, * as ReactPL from 'react-preload-link';
 
 // configure enzyme
 configure({ adapter: new Adapter() });
