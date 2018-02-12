@@ -29,7 +29,9 @@ declare module 'react-preload-link' {
         onClick?: () => any,
     }
 
-    export default class PreloadLink extends React.Component<PreloadLinkProps, any> {}
-
     export const configure: PreloadLinkConfig;
+
+    export class PreloadLinkComponent extends React.Component<PreloadLinkProps, any> {}
+
+    export default class PreloadLink extends React.Component<PreloadLinkProps, any> {}
 }

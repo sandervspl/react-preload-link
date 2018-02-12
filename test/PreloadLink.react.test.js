@@ -1,14 +1,14 @@
 /* eslint-disable no-undef */
 import React, { Fragment } from 'react';
 import { MemoryRouter as Router, withRouter } from 'react-router-dom';
-import { mount, shallow, configure } from 'enzyme';
+import { mount, configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import sinon from 'sinon';
 
-import * as rpl from '../src';
-import { PreloadLink as PreloadLinkComp } from '../src/PreloadLink';
+import * as rpl from 'react-preload-link';
+import { PreloadLinkComponent } from 'react-preload-link';
 
-const PreloadLink = withRouter(PreloadLinkComp);
+const PreloadLink = withRouter(PreloadLinkComponent);
 
 // configure enzyme
 configure({ adapter: new Adapter() });
@@ -468,10 +468,10 @@ describe('<PreloadLink>', () => {
             const onClickFn = sinon.spy();
 
             mountWithRouter(
-                <React.Fragment>
+                <Fragment>
                     <PreloadLink to="page1" noInterrupt load={timeoutFn} />
                     <PreloadLink to="page2" onClick={onClickFn} />
-                </React.Fragment>
+                </Fragment>
             );
 
             getPreloadLink().at(0).simulate('click');
