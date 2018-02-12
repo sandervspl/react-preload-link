@@ -4,11 +4,9 @@ import { MemoryRouter as Router, withRouter } from 'react-router-dom';
 import { mount, configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import sinon from 'sinon';
+import * as ReactPL from 'react-preload-link';
 
-import * as rpl from 'react-preload-link';
-import { PreloadLinkComponent } from 'react-preload-link';
-
-const PreloadLink = withRouter(PreloadLinkComponent);
+const PreloadLink = withRouter(ReactPL.PreloadLinkComponent);
 
 // configure enzyme
 configure({ adapter: new Adapter() });
@@ -54,7 +52,7 @@ describe('<PreloadLink>', () => {
     const click = () => getPreloadLink().simulate('click');
 
     beforeEach(() => {
-        rpl.configure({});
+        ReactPL.configure({});
         resolves = [];
         clock = sinon.useFakeTimers();
 
@@ -134,7 +132,7 @@ describe('<PreloadLink>', () => {
             const handleSuccess = (success) => success();
             const handleNavigate = (navigate) => navigate();
 
-            rpl.configure({
+            ReactPL.configure({
                 onLoading: fnLoad,
                 onSuccess: fnSuccess,
                 onNavigate: fnOnNavigate,
@@ -167,7 +165,7 @@ describe('<PreloadLink>', () => {
             const fnFail = sinon.spy();
             const handleFail = (fail) => fail();
 
-            rpl.configure({
+            ReactPL.configure({
                 onFail: fnFail,
             });
 
@@ -239,6 +237,15 @@ describe('<PreloadLink>', () => {
                 .toBe(true);
         });
 
+        it('Is an NavLink when only an activeClassName is passed', () => {
+            mountWithRouter(<PreloadLink to="/" activeClassName="active" />);
+
+            expect(getPreloadLink()
+                .render()
+                .hasClass('active'))
+                .toBe(true);
+        });
+
         it('Calls onClick function', () => {
             const fn = sinon.spy();
             mountWithRouter(<PreloadLink to="/page1" onClick={fn} />);
@@ -279,7 +286,7 @@ describe('<PreloadLink>', () => {
             const fn1 = sinon.spy();
             const fn2 = sinon.spy();
 
-            rpl.configure({
+            ReactPL.configure({
                 onLoading: fn1,
                 onSuccess: fn1,
                 onFail: fn2,
@@ -304,7 +311,7 @@ describe('<PreloadLink>', () => {
             const fn1 = sinon.spy();
             const fn2 = sinon.spy();
 
-            rpl.configure({
+            ReactPL.configure({
                 onLoading: fn1,
                 onSuccess: fn1,
                 onFail: fn2,
@@ -327,7 +334,7 @@ describe('<PreloadLink>', () => {
 
             expect.assertions(2);
 
-            rpl.configure({
+            ReactPL.configure({
                 onNavigate: fn,
             });
 
@@ -342,7 +349,7 @@ describe('<PreloadLink>', () => {
         });
 
         it('Logs an error when a hook is not a function', () => {
-            rpl.configure({
+            ReactPL.configure({
                 onLoading: 1,
             });
             mountWithRouter(<PreloadLink to="/page1" load={timeoutFn} />);
@@ -426,7 +433,7 @@ describe('<PreloadLink>', () => {
         it('Safely fails when a Promise from an array rejects', (done) => {
             const fn = sinon.spy();
 
-            rpl.configure({
+            ReactPL.configure({
                 onFail: fn,
             });
 

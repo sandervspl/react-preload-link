@@ -185,7 +185,7 @@ export class PreloadLink extends React.Component {
 
     render() {
         const { to, children, navLink, className, activeClassName } = this.props;
-        const Element = navLink ? NavLink : Link;
+        const Element = navLink || activeClassName ? NavLink : Link;
         const props = {};
 
         if (navLink) {
