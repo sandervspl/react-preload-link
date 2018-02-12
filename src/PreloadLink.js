@@ -4,7 +4,7 @@ import { withRouter, Link, NavLink } from 'react-router-dom';
 import { uuid, noop } from './helpers';
 import * as c from './constants';
 
-class PreloadLink extends React.Component {
+export class PreloadLink extends React.Component {
     static [c.ON_LOADING];
     static [c.ON_SUCCESS];
     static [c.ON_FAIL];
@@ -12,7 +12,7 @@ class PreloadLink extends React.Component {
     static process = {
         uid: 0,
         busy: false,
-        cancelUid: 0,
+        cancelUid: null,
         canCancel: true,
     };
 
@@ -63,6 +63,7 @@ class PreloadLink extends React.Component {
         PreloadLink.process = {
             ...PreloadLink.process,
             uid: 0,
+            cancelUid: null,
             busy: false,
         };
 
@@ -144,7 +145,7 @@ class PreloadLink extends React.Component {
             .then(() => {
                 // do not perform further navigation if this was ordered for cancel
                 if (process.cancelUid === this.uid) {
-                    return;
+                    return false;
                 }
 
                 this.prepareHookCall(c.ON_SUCCESS, this.navigate);
@@ -160,7 +161,9 @@ class PreloadLink extends React.Component {
         const { onClick } = this.props;
 
         // prevents navigation
-        e.preventDefault();
+        if (e && e.preventDefault) {
+            e.preventDefault();
+        }
 
         // prevent navigation if we can't override a load with a new click
         if (process.busy && !process.canCancel) return;

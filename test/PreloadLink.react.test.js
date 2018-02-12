@@ -1,11 +1,14 @@
 /* eslint-disable no-undef */
 import React, { Fragment } from 'react';
-import { MemoryRouter as Router } from 'react-router-dom';
-import { mount, configure } from 'enzyme';
+import { MemoryRouter as Router, withRouter } from 'react-router-dom';
+import { mount, shallow, configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import sinon from 'sinon';
 
-import PreloadLink, * as rpl from 'react-preload-link';
+import * as rpl from '../src';
+import { PreloadLink as PreloadLinkComp } from '../src/PreloadLink';
+
+const PreloadLink = withRouter(PreloadLinkComp);
 
 // configure enzyme
 configure({ adapter: new Adapter() });
@@ -383,7 +386,7 @@ describe('<PreloadLink>', () => {
                     <PreloadLink to="page1" noInterrupt load={timeoutFn} />
                     <PreloadLink to="page2" load={loadCb} />
                 </Fragment>
-            )
+            );
 
             getPreloadLink().at(0).simulate('click'); // with noInterrupt
             getPreloadLink().at(1).simulate('click'); // without
@@ -461,20 +464,27 @@ describe('<PreloadLink>', () => {
     });
 
     describe('PreloadLink process', () => {
-        it('Stops onClick if process is busy and can\'t cancel', () => {
-            PreloadLinkObj.process.busy = true;
-            PreloadLinkObj.process.canCancel = false;
+        it('Does not fire onClick method if process is busy and can\'t cancel', () => {
+            const onClickFn = sinon.spy();
 
             mountWithRouter(
-                <PreloadLink to="page1" />
+                <React.Fragment>
+                    <PreloadLink to="page1" noInterrupt load={timeoutFn} />
+                    <PreloadLink to="page2" onClick={onClickFn} />
+                </React.Fragment>
             );
 
-            click();
+            getPreloadLink().at(0).simulate('click');
+            getPreloadLink().at(1).simulate('click');
 
-            expect(getPathname()).toEqual('/');
+            clock.tick(LOAD_DELAY);
+
+            expect(onClickFn.called).toBe(false);
         });
 
-        it('Correctly sets process cancelUid', () => {
+        it('Correctly sets cancelUid', (done) => {
+            expect.assertions(1);
+
             let uid;
 
             mountWithRouter(
@@ -484,11 +494,16 @@ describe('<PreloadLink>', () => {
                 </Fragment>
             );
 
-            getPreloadLink().at(0).simulate('click');
+            getPreloadLink().at(0).simulate('click'); // with noInterrupt
             uid = PreloadLinkObj.process.uid;
-            getPreloadLink().at(1).simulate('click');
 
-            expect(PreloadLinkObj.process.cancelUid).toEqual(uid);
+            getPreloadLink().at(1).simulate('click'); // without
+
+            process.nextTick(() => {
+                expect(PreloadLinkObj.process.cancelUid).toEqual(uid);
+                clock.tick(LOAD_DELAY);
+                done();
+            });
         });
 
         it('Correctly sets process canCancel to false', () => {
@@ -503,6 +518,29 @@ describe('<PreloadLink>', () => {
             click();
 
             expect(PreloadLinkObj.process.canCancel).toBe(false);
+        });
+
+        it('Does not continue load process if uid == cancelUid', (done) => {
+            expect.assertions(1);
+
+            const successFn = sinon.spy();
+
+            mountWithRouter(
+                <Fragment>
+                    <PreloadLink to="page1" load={timeoutFn} onSuccess={successFn} />
+                    <PreloadLink to="page2" load={timeoutFn} />
+                </Fragment>
+            );
+
+            getPreloadLink().at(0).simulate('click');
+            getPreloadLink().at(1).simulate('click');
+
+            clock.tick(LOAD_DELAY);
+
+            process.nextTick(() => {
+                expect(successFn.calledOnce).toBe(false);
+                done();
+            });
         });
     });
 });
