@@ -1,6 +1,6 @@
 import React from 'react';
 import PT from 'prop-types';
-import PreloadLink, { PRELOAD_FAIL } from 'react-preload-link';
+import PreloadLink from 'react-preload-link';
 import { connect } from 'react-redux';
 import NProgress from 'nprogress';
 import { setSuccess, setLoading, setFailed } from '../../ducks/app';
@@ -62,7 +62,7 @@ class Home extends React.Component {
 
     asyncFnFail = () => (
         new Promise((_, reject) => (
-            setTimeout(() => reject(PRELOAD_FAIL), this.state.waitTime.value)
+            setTimeout(() => reject(), this.state.waitTime.value)
         ))
     )
 
