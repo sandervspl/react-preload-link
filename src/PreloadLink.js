@@ -17,7 +17,7 @@ let globalLinkState = Object.freeze({
     },
 });
 
-const updateGlobalLinkState = (nextState) => {
+const setGlobalLinkState = (nextState) => {
     globalLinkState = Object.freeze({
         ...globalLinkState,
         ...nextState,
@@ -25,7 +25,7 @@ const updateGlobalLinkState = (nextState) => {
 };
 
 export const configure = (options) => {
-    updateGlobalLinkState({
+    setGlobalLinkState({
         [c.ON_LOADING]: options[c.ON_LOADING] || noop,
         [c.ON_SUCCESS]: options[c.ON_SUCCESS] || noop,
         [c.ON_FAIL]: options[c.ON_FAIL] || noop,
@@ -62,7 +62,7 @@ export class PreloadLink extends React.Component {
             nextProcess.canCancel = false;
         }
 
-        updateGlobalLinkState({
+        setGlobalLinkState({
             process: {
                 ...globalLinkState.process,
                 ...nextProcess,
@@ -84,7 +84,7 @@ export class PreloadLink extends React.Component {
             nextProcess.canCancel = true;
         }
 
-        updateGlobalLinkState({
+        setGlobalLinkState({
             process: {
                 ...globalLinkState.process,
                 ...nextProcess,
