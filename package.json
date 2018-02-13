@@ -109,7 +109,7 @@
         "build": "nps build",
         "lint": "eslint .",
         "deploy": "cross-env NODE_ENV=production nps publish",
-        "start": "webpack-dev-server --progress",
+        "start": "webpack-dev-server",
         "test": "clear && jest ./test/*.test.js",
         "test:watch": "npm test -- --watch",
         "test:cov": "npm test -- --coverage"

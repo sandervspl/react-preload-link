@@ -1,4 +1,8 @@
-import { default as PreloadLink, configure, PreloadLink as PreloadLinkComponent } from './PreloadLink';
+import {
+    default as PreloadLink,
+    configure,
+    PreloadLink as PreloadLinkComponent,
+} from './PreloadLink';
 
 export default PreloadLink;
 export {

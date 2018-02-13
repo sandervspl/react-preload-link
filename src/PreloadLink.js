@@ -4,26 +4,39 @@ import { withRouter, Link, NavLink } from 'react-router-dom';
 import { uuid, noop } from './helpers';
 import * as c from './constants';
 
-export class PreloadLink extends React.Component {
-    static [c.ON_LOADING];
-    static [c.ON_SUCCESS];
-    static [c.ON_FAIL];
-    static [c.ON_NAVIGATE];
-    static process = {
+let globalLinkState = Object.freeze({
+    [c.ON_LOADING]: noop,
+    [c.ON_SUCCESS]: noop,
+    [c.ON_FAIL]: noop,
+    [c.ON_NAVIGATE]: noop,
+    process: {
         uid: 0,
         busy: false,
         cancelUid: null,
         canCancel: true,
-    };
+    },
+});
+
+const updateGlobalLinkState = (nextState) => {
+    globalLinkState = Object.freeze({
+        ...globalLinkState,
+        ...nextState,
+    });
+};
+
+export const configure = (options) => {
+    updateGlobalLinkState({
+        [c.ON_LOADING]: options[c.ON_LOADING] || noop,
+        [c.ON_SUCCESS]: options[c.ON_SUCCESS] || noop,
+        [c.ON_FAIL]: options[c.ON_FAIL] || noop,
+        [c.ON_NAVIGATE]: options[c.ON_NAVIGATE] || noop,
+    });
+};
+
+export class PreloadLink extends React.Component {
+    static getGlobalState = () => globalLinkState;
 
     // Initialize the lifecycle hooks
-    static init = (options) => {
-        PreloadLink[c.ON_LOADING] = options[c.ON_LOADING];
-        PreloadLink[c.ON_SUCCESS] = options[c.ON_SUCCESS];
-        PreloadLink[c.ON_FAIL] = options[c.ON_FAIL];
-        PreloadLink[c.ON_NAVIGATE] = options[c.ON_NAVIGATE];
-    }
-
     constructor() {
         super();
 
@@ -35,37 +48,48 @@ export class PreloadLink extends React.Component {
     }
 
     setLoading = (callback = noop) => {
-        const { process } = PreloadLink;
+        const { process } = globalLinkState;
         const { noInterrupt } = this.props;
-
-        if (!noInterrupt && process.busy && process.uid !== this.uid) {
-            process.cancelUid = process.uid;
-        } else if (noInterrupt) {
-            // any further clicks can not cancel this process
-            process.canCancel = false;
-        }
-
-        PreloadLink.process = {
-            ...process,
+        const nextProcess = {
             uid: this.uid,
             busy: true,
         };
+
+        if (!noInterrupt && process.busy && process.uid !== this.uid) {
+            nextProcess.cancelUid = process.uid;
+        } else if (noInterrupt) {
+            // any further clicks can not cancel this process
+            nextProcess.canCancel = false;
+        }
+
+        updateGlobalLinkState({
+            process: {
+                ...globalLinkState.process,
+                ...nextProcess,
+            },
+        });
 
         this.setState({ loading: true }, callback);
     }
 
     setLoaded = (callback = noop) => {
-        // reset for further navigation
-        if (!PreloadLink.process.canCancel) {
-            PreloadLink.process.canCancel = true;
-        }
-
-        PreloadLink.process = {
-            ...PreloadLink.process,
+        const nextProcess = {
             uid: 0,
             cancelUid: null,
             busy: false,
         };
+
+        if (!globalLinkState.process.canCancel) {
+            // reset for further navigation
+            nextProcess.canCancel = true;
+        }
+
+        updateGlobalLinkState({
+            process: {
+                ...globalLinkState.process,
+                ...nextProcess,
+            },
+        });
 
         this.setState({ loading: false }, callback);
     }
@@ -87,7 +111,7 @@ export class PreloadLink extends React.Component {
     // NOTE: it's best to use prepareHookCall if you want to execute hooks,
     // because it will ensure the correct loading state is set
     executeHook = (state) => {
-        const fn = PreloadLink[state];
+        const fn = globalLinkState[state];
 
         if (!fn) return;
 
@@ -96,7 +120,7 @@ export class PreloadLink extends React.Component {
         } else {
             fn();
         }
-    };
+    }
 
     prepareHookCall = (state, fn = noop) => {
         const setLoadState = state === c.ON_LOADING ? this.setLoading : this.setLoaded;
@@ -125,7 +149,7 @@ export class PreloadLink extends React.Component {
 
     // prepares the page transition. Wait on all promises to resolve before changing route.
     prepareNavigation = () => {
-        const { process } = PreloadLink;
+        const { process } = globalLinkState;
         const { load } = this.props;
         const isArray = Array.isArray(load);
         let toLoad;
@@ -157,7 +181,7 @@ export class PreloadLink extends React.Component {
     }
 
     handleClick = (e) => {
-        const { process } = PreloadLink;
+        const { process } = globalLinkState;
         const { onClick } = this.props;
 
         // prevents navigation
@@ -229,9 +253,6 @@ PreloadLink.defaultProps = {
     navLink: false,
     onClick: noop,
 };
-
-// component initialization function
-export const configure = PreloadLink.init;
 
 // component
 export default withRouter(PreloadLink);
