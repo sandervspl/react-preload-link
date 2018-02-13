@@ -15,12 +15,13 @@ jest.setTimeout(200);
 // constants
 const LOAD_DELAY = 100;
 
+// TODO: create reusable clock.tick func
+// TODO: fix branch uncovered lines (37, 57, 164, 180)
+
 describe('<PreloadLink>', () => {
     let wrapper;
     let clock;
     let resolves;
-
-    const PreloadLinkObj = PreloadLink.WrappedComponent;
 
     const timeoutFn = () => new Promise((resolve) => setTimeout(() => {
         resolves.push(true);
@@ -47,6 +48,7 @@ describe('<PreloadLink>', () => {
         )
     };
 
+    // TODO: add .to(n)
     const click = () => getPreloadLink().simulate('click');
 
     beforeEach(() => {
@@ -384,8 +386,9 @@ describe('<PreloadLink>', () => {
 
         it('Is impossible to interrupt an uninterruptable link', (done) => {
             expect.assertions(6);
-
             const loadCb = sinon.spy();
+            let state;
+
             mountWithRouter(
                 <Fragment>
                     <PreloadLink to="page1" noInterrupt load={timeoutFn} />
@@ -396,15 +399,19 @@ describe('<PreloadLink>', () => {
             getPreloadLink().at(0).simulate('click'); // with noInterrupt
             getPreloadLink().at(1).simulate('click'); // without
 
-            expect(PreloadLinkObj.process.busy).toBe(true);
-            expect(PreloadLinkObj.process.canCancel).toBe(false);
+            state = PreloadLink.getGlobalState();
+
+            expect(state.process.busy).toBe(true);
+            expect(state.process.canCancel).toBe(false);
             expect(loadCb.notCalled).toBe(true);
 
             clock.tick(LOAD_DELAY);
 
             process.nextTick(() => {
-                expect(PreloadLinkObj.process.busy).toBe(false);
-                expect(PreloadLinkObj.process.canCancel).toBe(true);
+                state = PreloadLink.getGlobalState();
+
+                expect(state.process.busy).toBe(false);
+                expect(state.process.canCancel).toBe(true);
                 expect(getPathname()).toEqual('/page1');
                 done();
             });
@@ -490,6 +497,7 @@ describe('<PreloadLink>', () => {
         it('Correctly sets cancelUid', (done) => {
             expect.assertions(1);
 
+            let state;
             let uid;
 
             mountWithRouter(
@@ -500,12 +508,15 @@ describe('<PreloadLink>', () => {
             );
 
             getPreloadLink().at(0).simulate('click'); // with noInterrupt
-            uid = PreloadLinkObj.process.uid;
+            state = PreloadLink.getGlobalState();
+            uid = state.process.uid;
 
             getPreloadLink().at(1).simulate('click'); // without
 
             process.nextTick(() => {
-                expect(PreloadLinkObj.process.cancelUid).toEqual(uid);
+                state = PreloadLink.getGlobalState();
+
+                expect(state.process.cancelUid).toEqual(uid);
                 clock.tick(LOAD_DELAY);
                 done();
             });
@@ -522,7 +533,8 @@ describe('<PreloadLink>', () => {
 
             click();
 
-            expect(PreloadLinkObj.process.canCancel).toBe(false);
+            const state = PreloadLink.getGlobalState();
+            expect(state.process.canCancel).toBe(false);
         });
 
         it('Does not continue load process if uid == cancelUid', (done) => {
