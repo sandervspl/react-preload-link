@@ -59,7 +59,7 @@ const PreloadExample = () => {
 ```ts
 PreloadLinkProps {
     to: string,
-    load?: () => Promise<any> | (() => Promise<any>)[],
+    load?: () => Promise<any> | Array<() => Promise<any>>,
     onLoading?: (defaultHook: () => void) => any,
     onSuccess?: (defaultHook: () => void) => any,
     onFail?: (defaultHook: () => void) => any,
@@ -79,7 +79,7 @@ Type: `string`
 The URL to which the app will navigate to. If `load` is used, it will navigate after the `load` function(s) resolve. The only required prop.
 
 ### load
-Type: `() => Promise<any> | (() => Promise<any>)[]`
+Type: `() => Promise<any> | Array<() => Promise<any>>`
 
 Promise that will be resolved before navigating to the URL provided by `to`. This can be a single function or multiple in an Array. **Must be a function that returns a Promise!** It will wait for everything to resolve before navigating.
 
