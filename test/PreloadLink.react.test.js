@@ -15,7 +15,6 @@ jest.setTimeout(200);
 // constants
 const LOAD_DELAY = 100;
 
-// TODO: create reusable clock.tick func
 // TODO: fix branch uncovered lines (37, 57, 164, 180)
 
 describe('<PreloadLink>', () => {
@@ -49,6 +48,8 @@ describe('<PreloadLink>', () => {
     };
 
     const click = (n = 0) => getPreloadLink().at(n).simulate('click');
+
+    const clockDelay = (time = LOAD_DELAY) => clock.tick(time);
 
     beforeEach(() => {
         ReactPL.configure({});
@@ -89,7 +90,7 @@ describe('<PreloadLink>', () => {
             );
 
             click();
-            clock.tick(LOAD_DELAY);
+            clockDelay();
 
             process.nextTick(() => {
                 expect(fn.callCount).toEqual(3);
@@ -112,7 +113,7 @@ describe('<PreloadLink>', () => {
             );
 
             click();
-            clock.tick(LOAD_DELAY);
+            clockDelay();
 
             process.nextTick(() => {
                 expect(fn.callCount).toEqual(2);
@@ -148,7 +149,7 @@ describe('<PreloadLink>', () => {
             );
 
             click();
-            clock.tick(LOAD_DELAY);
+            clockDelay();
 
             process.nextTick(() => {
                 expect(fnLoad.calledOnce).toBe(true);
@@ -177,7 +178,7 @@ describe('<PreloadLink>', () => {
             );
 
             click();
-            clock.tick(LOAD_DELAY);
+            clockDelay();
 
             process.nextTick(() => {
                 expect(fnFail.calledOnce).toBe(true);
@@ -256,8 +257,9 @@ describe('<PreloadLink>', () => {
 
         it('Logs an error when a hook is not a function', () => {
             mountWithRouter(<PreloadLink to="/page1" load={timeoutFn} onLoading={1} />);
+
             click();
-            clock.tick(LOAD_DELAY);
+            clockDelay();
             expect(console.error).toHaveBeenCalled();
         });
     });
@@ -271,7 +273,7 @@ describe('<PreloadLink>', () => {
             expect.assertions(1);
 
             click();
-            clock.tick(LOAD_DELAY);
+            clockDelay();
 
             process.nextTick(() => {
                 expect(getPathname()).toEqual('/page1');
@@ -293,7 +295,7 @@ describe('<PreloadLink>', () => {
             });
 
             click();
-            clock.tick(LOAD_DELAY);
+            clockDelay();
 
             process.nextTick(() => {
                 expect(fn1.calledThrice).toBe(true);
@@ -317,7 +319,7 @@ describe('<PreloadLink>', () => {
             });
 
             click();
-            clock.tick(LOAD_DELAY);
+            clockDelay();
 
             process.nextTick(() => {
                 expect(fn1.calledOnce).toBe(true);
@@ -338,7 +340,7 @@ describe('<PreloadLink>', () => {
             });
 
             click();
-            clock.tick(LOAD_DELAY);
+            clockDelay();
 
             process.nextTick(() => {
                 expect(fn.called).toBe(true);
@@ -351,9 +353,11 @@ describe('<PreloadLink>', () => {
             ReactPL.configure({
                 onLoading: 1,
             });
+
             mountWithRouter(<PreloadLink to="/page1" load={timeoutFn} />);
+
             click();
-            clock.tick(LOAD_DELAY);
+            clockDelay();
             expect(console.error).toHaveBeenCalled();
         });
     });
@@ -375,7 +379,7 @@ describe('<PreloadLink>', () => {
 
             expect(getPathname()).not.toEqual('/page1');
 
-            clock.tick(LOAD_DELAY);
+            clockDelay();
 
             process.nextTick(() => {
                 expect(getPathname()).toEqual('/page1');
@@ -404,7 +408,7 @@ describe('<PreloadLink>', () => {
             expect(state.process.canCancel).toBe(false);
             expect(loadCb.notCalled).toBe(true);
 
-            clock.tick(LOAD_DELAY);
+            clockDelay();
 
             process.nextTick(() => {
                 state = PreloadLink.getGlobalState();
@@ -425,7 +429,7 @@ describe('<PreloadLink>', () => {
 
             expect(getPathname()).not.toEqual('/page1');
 
-            clock.tick(LOAD_DELAY);
+            clockDelay();
 
             process.nextTick(() => {
                 expect(resolves.length).toEqual(2);
@@ -444,8 +448,7 @@ describe('<PreloadLink>', () => {
             mountWithRouter(<PreloadLink to="page1" load={[timeoutFn, timeoutFnFail]} />);
 
             click();
-
-            clock.tick(LOAD_DELAY);
+            clockDelay();
 
             process.nextTick(() => {
                 expect(fn.calledOnce).toBe(true);
@@ -487,8 +490,7 @@ describe('<PreloadLink>', () => {
 
             click(0);
             click(1);
-
-            clock.tick(LOAD_DELAY);
+            clockDelay();
 
             expect(onClickFn.called).toBe(false);
         });
@@ -516,7 +518,7 @@ describe('<PreloadLink>', () => {
                 state = PreloadLink.getGlobalState();
 
                 expect(state.process.cancelUid).toEqual(uid);
-                clock.tick(LOAD_DELAY);
+                clockDelay();
                 done();
             });
         });
@@ -550,8 +552,7 @@ describe('<PreloadLink>', () => {
 
             click(0);
             click(1);
-
-            clock.tick(LOAD_DELAY);
+            clockDelay();
 
             process.nextTick(() => {
                 expect(successFn.calledOnce).toBe(false);
