@@ -4,7 +4,7 @@ import { MemoryRouter as Router } from 'react-router-dom';
 import { mount, configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import sinon from 'sinon';
-import PreloadLink, * as ReactPL from 'react-preload-link';
+import PreloadLink, * as ReactPL from '../src';
 
 // configure enzyme
 configure({ adapter: new Adapter() });
@@ -48,8 +48,7 @@ describe('<PreloadLink>', () => {
         )
     };
 
-    // TODO: add .to(n)
-    const click = () => getPreloadLink().simulate('click');
+    const click = (n = 0) => getPreloadLink().at(n).simulate('click');
 
     beforeEach(() => {
         ReactPL.configure({});
@@ -396,8 +395,8 @@ describe('<PreloadLink>', () => {
                 </Fragment>
             );
 
-            getPreloadLink().at(0).simulate('click'); // with noInterrupt
-            getPreloadLink().at(1).simulate('click'); // without
+            click(0); // with noInterrupt
+            click(1); // without
 
             state = PreloadLink.getGlobalState();
 
@@ -486,8 +485,8 @@ describe('<PreloadLink>', () => {
                 </Fragment>
             );
 
-            getPreloadLink().at(0).simulate('click');
-            getPreloadLink().at(1).simulate('click');
+            click(0);
+            click(1);
 
             clock.tick(LOAD_DELAY);
 
@@ -507,11 +506,11 @@ describe('<PreloadLink>', () => {
                 </Fragment>
             );
 
-            getPreloadLink().at(0).simulate('click'); // with noInterrupt
+            click(0); // with noInterrupt
             state = PreloadLink.getGlobalState();
             uid = state.process.uid;
 
-            getPreloadLink().at(1).simulate('click'); // without
+            click(1); // without
 
             process.nextTick(() => {
                 state = PreloadLink.getGlobalState();
@@ -549,8 +548,8 @@ describe('<PreloadLink>', () => {
                 </Fragment>
             );
 
-            getPreloadLink().at(0).simulate('click');
-            getPreloadLink().at(1).simulate('click');
+            click(0);
+            click(1);
 
             clock.tick(LOAD_DELAY);
 
