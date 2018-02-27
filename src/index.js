@@ -4,8 +4,9 @@ import {
     PreloadLink as PreloadLinkComponent,
 } from './PreloadLink';
 
-export default PreloadLink;
 export {
     configure,
     PreloadLinkComponent,
 };
+
+export default PreloadLink;
