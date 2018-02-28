@@ -74,55 +74,51 @@ PreloadLinkProps {
 ```
 
 ### to (Required)
-Type: `string`
+> `string`
 
 The URL to which the app will navigate to. If `load` is used, it will navigate after the `load` function(s) resolve. The only required prop.
 
 ### load
-Type: `() => Promise<any> | Array<() => Promise<any>>`
+> `() => Promise<any> | Array<() => Promise<any>>`
 
 Promise that will be resolved before navigating to the URL provided by `to`. This can be a single function or multiple in an Array. **Must be a function that returns a Promise!** It will wait for everything to resolve before navigating.
 
 **Note**: If you see an error that says "Can not read then of undefined" then one of your passed functions does not return a Promise.
 
 ### onLoading, onSuccess, onFail, onNavigate
-Type: `(defaultHook: () => void) => void`
+> `(defaultHook: () => void) => void`
 
 Overriding the default hooks, set with `configure`, can be done with these props. The default hook is passed as a parameter.
 
 ### loadMiddleware
-Type: `(data: any) => void`
+> `(data: any) => void`
 
 Will fire for each of your resolved Promises. The resolved data is passed as a parameter.
 
 **Note:** This will fire multiple times if you pass an Array to `load`.
 
 ### noInterrupt
-Type: `boolean`
-
-Default: `false`
+> `boolean` | Default `false`
 
  PreloadLinks with this prop can not have their `load` be interrupted by any other PreloadLink.
  
 ### className
-Type: `string`
+> `string`
 
 The CSS class to be set on the `<a>` element.
 
 ### navLink
-Type: `boolean`
-
-Default: `false`
+> `boolean` | Default `false`
 
 Use React-Router's `NavLink` instead of `Link`. This will give it the same benefits as the regular `NavLink`.
 
 ### activeClassName
-Type: `string`
+> `string`
 
 CSS class to be set on the `<a>` element when its route is active.
 
 ### onClick
-Type: `() => void`
+> `() => void`
 
 For any methods that should be fired instantly on click. Use this for methods that are not async.
 
@@ -157,21 +153,21 @@ PreloadLinkConfigOptions {
 ```
 
 ### onLoading
-Type: `() => any`
+> `() => any`
 
 Fires once when the load process has started. Only fires when `load` prop has been used.
 
 ### onSuccess
-Type: `() => any`
+> `() => any`
 
 Fires once when the all Promises have been resolved. Success is fired *before* navigation. Only fires when `load` prop has been used.
 
 ### onFail
-Type: `() => any`
+> `() => any`
 
 Fires once when one of the Promised from `load` fails or rejects. Only fires when `load` prop has been used.
 
 ### onNavigate
-Type: `() => any`
+> `() => any`
 
 Fires once *after* navigation. Always fires.
