@@ -50,8 +50,8 @@ h3 {
     background-color: #eee;
 }
 
-button {
-    all: unset;
+.button {
+    display: inline-block;
     background-color: cornflowerblue;
 }
 
@@ -61,14 +61,14 @@ a {
     color: cornflowerblue;
 }
 
-button a {
+.button a {
     display: block;
     padding: 5px 10px;
     color: #fff;
     text-decoration: none;
 }
 
-button:disabled {
+.button.disabled {
     background-color: rgba(100, 149, 237, 0.56);
 }
 

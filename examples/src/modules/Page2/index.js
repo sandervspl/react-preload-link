@@ -6,9 +6,9 @@ const Page2 = () => (
         <h2>Page 2</h2>
         <p>Not much to do here...</p>
 
-        <button>
+        <div className="button">
             <Link to="/">Back to home</Link>
-        </button>
+        </div>
     </div>
 );
 

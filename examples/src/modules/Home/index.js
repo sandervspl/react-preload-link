@@ -90,6 +90,9 @@ class Home extends React.Component {
         const fn = this.useFn();
         const loadList = this.loadPersonList();
 
+        let buttonClass = 'button';
+        if (personIdList === 0) buttonClass += ' disabled';
+
         return (
             <React.Fragment>
                 {app.error && <NotificationBar />}
@@ -137,7 +140,7 @@ class Home extends React.Component {
                     <div className="content inner">
                         <FetchForm personIdList={personIdList} setPersonId={this.setPersonId} />
 
-                        <button disabled={personIdList.length === 0}>
+                        <div className={buttonClass}>
                             <PreloadLink
                                 to={`profile/${personIdList}`}
                                 load={loadList}
@@ -147,7 +150,7 @@ class Home extends React.Component {
                             >
                                 To Star Wars person page
                             </PreloadLink>
-                        </button>
+                        </div>
                     </div>
                 </div>
             </React.Fragment>
