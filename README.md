@@ -13,13 +13,13 @@ Live demo: [https://sandervspl.github.io/react-preload-link/](https://sandervspl
 
 NPM
 
-```js
+```
 npm install --save react-preload-link
 ```
 
 YARN
 
-```js
+```
 yarn add react-preload-link
 ```
 
