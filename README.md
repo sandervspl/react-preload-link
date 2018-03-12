@@ -163,7 +163,7 @@ Fires once when all Promises from `load` have been resolved. `onSuccess` is fire
 ### onFail
 > `() => any`
 
-Fires once when one of the Promised from `load` fails or rejects. Only fires when `load` prop has been used.
+Fires once when one of the Promises from `load` fails or rejects. Only fires when `load` prop has been used.
 
 ### onNavigate
 > `() => any`
