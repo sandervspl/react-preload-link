@@ -158,7 +158,7 @@ Fires once when the load process has started. Only fires when `load` prop has be
 ### onSuccess
 > `() => any`
 
-Fires once when the all Promises have been resolved. Success is fired *before* navigation. Only fires when `load` prop has been used.
+Fires once when all Promises from `load` have been resolved. `onSuccess` is fired *before* navigation. Only fires when `load` prop has been used.
 
 ### onFail
 > `() => any`
