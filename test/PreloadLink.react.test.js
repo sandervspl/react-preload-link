@@ -4,7 +4,7 @@ import { MemoryRouter as Router } from 'react-router-dom';
 import { mount, configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import sinon from 'sinon';
-import PreloadLink, * as ReactPL from '../src';
+import PreloadLink, * as ReactPL from 'react-preload-link';
 
 // configure enzyme
 configure({ adapter: new Adapter() });
@@ -14,8 +14,6 @@ jest.setTimeout(200);
 
 // constants
 const LOAD_DELAY = 100;
-
-// TODO: fix branch uncovered lines (37, 57, 164, 180)
 
 describe('<PreloadLink>', () => {
     let wrapper;
