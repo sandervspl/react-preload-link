@@ -112,7 +112,7 @@ export class PreloadLink extends React.Component {
         if (!fn) return;
 
         if (typeof fn !== 'function') {
-            console.error(`PreloadLink: Method for lifecycle '${state}' is not a function.`);
+            console.error(`PreloadLink: Value for lifecycle '${state}' is not a function.`);
         } else {
             fn();
         }
@@ -124,7 +124,7 @@ export class PreloadLink extends React.Component {
 
         if (this.props[state]) {
             if (typeof this.props[state] !== 'function') {
-                console.error(`PreloadLink: Method for lifecycle '${state}' is not a function.`);
+                console.error(`PreloadLink: Value for lifecycle '${state}' is not a function.`);
             } else {
                 this.props[state](hook);
                 setLoadState(fn);
