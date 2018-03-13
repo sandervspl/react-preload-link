@@ -77,12 +77,8 @@ export class PreloadLink extends React.Component {
             uid: 0,
             cancelUid: null,
             busy: false,
+            canCancel: true,
         };
-
-        if (!globalLinkState.process.canCancel) {
-            // reset for further navigation
-            nextProcess.canCancel = true;
-        }
 
         setGlobalLinkState({
             process: {
