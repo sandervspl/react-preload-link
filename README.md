@@ -3,7 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/react-preload-link.svg)](https://www.npmjs.com/package/react-preload-link)
 [![npm downloads](https://img.shields.io/npm/dm/react-preload-link.svg)](https://www.npmjs.com/package/react-preload-link)
 
-A superversion of [React Router's](https://github.com/ReactTraining/react-router) Link component that preloads your data before navigating. Built with and for [React](http://facebook.github.io/react/index.html).
+A navigation link built on [React Router's](https://github.com/ReactTraining/react-router) Link component that preloads your data before navigating. Built with and for [React](http://facebook.github.io/react/index.html).
 
 ## Demo
 
@@ -13,13 +13,13 @@ Live demo: [https://sandervspl.github.io/react-preload-link/](https://sandervspl
 
 NPM
 
-```js
+```
 npm install --save react-preload-link
 ```
 
 YARN
 
-```js
+```
 yarn add react-preload-link
 ```
 
@@ -158,12 +158,12 @@ Fires once when the load process has started. Only fires when `load` prop has be
 ### onSuccess
 > `() => any`
 
-Fires once when the all Promises have been resolved. Success is fired *before* navigation. Only fires when `load` prop has been used.
+Fires once when all Promises from `load` have been resolved. `onSuccess` is fired *before* navigation. Only fires when `load` prop has been used.
 
 ### onFail
 > `() => any`
 
-Fires once when one of the Promised from `load` fails or rejects. Only fires when `load` prop has been used.
+Fires once when one of the Promises from `load` fails or rejects. Only fires when `load` prop has been used.
 
 ### onNavigate
 > `() => any`
